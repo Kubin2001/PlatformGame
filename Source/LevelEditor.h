@@ -17,9 +17,10 @@ class LevelEditor
     private:
         UI* ui;
         SDL_Renderer* renderer;
-        std::vector<SDL_Texture*> texturesMap;
-        std::vector<SDL_Texture*> texturesMobs;
-        std::vector<SDL_Texture*> texturesEquipment;
+        std::vector<PleacedObject> mapObjects;
+        std::vector<PleacedObject> mobsObjects;
+        std::vector<PleacedObject> equipmentObjects;
+        PleacedObject mouseObject;
         SDL_Texture* texturePlayer;
         SDL_Rect rectanglePlayer{ 700,400,50,100 };
         int menu = -1;
@@ -48,7 +49,7 @@ class LevelEditor
 
         void OnClick(SDL_Event event);
 
-        void MouseCollison(SDL_Event event, std::vector<SDL_Texture*>& textures, std::vector<SDL_Rect>& rectangles);
+        void MouseCollison(SDL_Event event, std::vector<PleacedObject>& object);
 
         void MouseCollisonObjects(SDL_Event event, std::vector<PleacedObject>& objects);
 
@@ -63,6 +64,8 @@ class LevelEditor
         void Settings(SDL_Event event);
 
         void Move(SDL_Event event);
+
+        void ResetPossition();
 
         void ChangeScales(SDL_Event event);
 

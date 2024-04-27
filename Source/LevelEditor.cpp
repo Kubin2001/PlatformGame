@@ -1,12 +1,15 @@
 #include <iostream>
 #include <SDL.h>
+#include "SDL_image.h"
 #include <string>
 #include <fstream> 
+#include <filesystem>
 #include "LevelEditor.h"
 #include "UI.h"
 #include "Colision.h"
 
 extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
+
 
 LevelEditor::LevelEditor(SDL_Renderer* renderer) {
     this->renderer = renderer;
@@ -24,23 +27,46 @@ LevelEditor::LevelEditor(SDL_Renderer* renderer) {
     ui->CreateSingleButton(50, 300, 200, 50, "LOAD", 20, 21);
 }
 
+void LoadHelper(std::vector<PleacedObject>& vector, std::string directory, SDL_Renderer* renderer) {
+    PleacedObject obj;
+    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory))
+    {
+        if (entry.path().extension() == ".png") {
+            std::string pathString = entry.path().string();
+            const char* path = pathString.c_str();
+            vector.push_back(obj);
+            vector[vector.size() - 1].text = load(path, renderer);
+            SDL_QueryTexture(vector[vector.size() - 1].text, NULL, NULL, &vector[vector.size() - 1].rect.w, &vector[vector.size() - 1].rect.h);
+            std::string temp = "";
+            for (int i = directory.length(); i < pathString.length(); i++)
+            {
+                if (pathString[i + 1] == '.') {
+                    break;
+                }
+                temp += pathString[i + 1];
+            }
+            vector[vector.size() - 1].name = temp;
+            temp = "";
+        }
+
+    }
+}
+
 void LevelEditor::LoadTextures() {
-    ui->SetTextureButton(load("Textures/Interface/button.png", renderer));
-    ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
-    ui->SetTextureButtonInfo(load("Textures/Interface/buttonInfo.png", renderer));
+    std::string terrain = "Textures/Terrain";
+    std::string mobs = "Textures/Mobs";
+    std::string equipment = "Textures/Equipment";
+    LoadHelper(mapObjects, terrain, renderer);
+    LoadHelper(mobsObjects, mobs, renderer);
+    LoadHelper(equipmentObjects, equipment, renderer);
 
     texturePlayer = load("Textures/player.png", renderer);
 
-    texturesMap.push_back(load("Textures/Terrain/grass.png", renderer));
-    texturesMap.push_back(load("Textures/Terrain/platform.png", renderer));
-    texturesMap.push_back(load("Textures/Terrain/pillar.png", renderer));
-    texturesMap.push_back(load("Textures/Terrain/flag.png", renderer));
-
-    texturesMobs.push_back(load("Textures/Mobs/charger.png", renderer));
-    texturesMobs.push_back(load("Textures/Mobs/wolf.png", renderer));
-
-    texturesEquipment.push_back(load("Textures/Equipment/shortSword.png", renderer));
+    ui->SetTextureButton(load("Textures/Interface/button.png", renderer));
+    ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
+    ui->SetTextureButtonInfo(load("Textures/Interface/buttonInfo.png", renderer));
 }
+
 
 void LevelEditor::OnClick(SDL_Event event) {
     ui->OnClickEditor(menu,event);
@@ -54,9 +80,8 @@ void LevelEditor::OnClick(SDL_Event event) {
         rectangles.clear();
         switch (menu)
         {
-            case 0:
-            {
-                for (int i = 0; i < texturesMap.size(); i++)
+            case 0://Terrain
+                for (int i = 0; i < mapObjects.size(); i++)
                 {
                     rectangles.push_back(rect);
                     rectangles[rectangles.size() - 1].x = posX;
@@ -65,11 +90,9 @@ void LevelEditor::OnClick(SDL_Event event) {
                     rectangles[rectangles.size() - 1].h = 100;
                     posX += 200;
                 }
-            }
-            break;
-            case 1:
-            {
-                for (int i = 0; i < texturesMobs.size(); i++)
+                break;
+            case 1://Mobs
+                for (int i = 0; i < mobsObjects.size(); i++)
                 {
                     rectangles.push_back(rect);
                     rectangles[rectangles.size() - 1].x = posX;
@@ -78,11 +101,9 @@ void LevelEditor::OnClick(SDL_Event event) {
                     rectangles[rectangles.size() - 1].h = 100;
                     posX += 200;
                 }
-            }
-            break;
-            case 2:
-            {
-                for (int i = 0; i < texturesEquipment.size(); i++)
+                break;
+            case 2://Equipment
+                for (int i = 0; i < equipmentObjects.size(); i++)
                 {
                     rectangles.push_back(rect);
                     rectangles[rectangles.size() - 1].x = posX;
@@ -91,55 +112,30 @@ void LevelEditor::OnClick(SDL_Event event) {
                     rectangles[rectangles.size() - 1].h = 100;
                     posX += 200;
                 }
-            }
-            break;
+                break;
             case 4:
-            {
-                for (size_t i = 0; i < objects.size(); i++)
-                {
-                    objects[i].rect.x += xTrue;
-                    objects[i].rect.y += yTrue;
-                }
-                rectanglePlayer.x += xTrue;
-                rectanglePlayer.y += yTrue;
-                xTrue = 0;
-                yTrue = 0;
-                menu = -1;
-            }
-            break;
+                ResetPossition();
+                break;
             case 5:
-            {
-                for (size_t i = 0; i < objects.size(); i++)
-                {
-                    objects[i].rect.x += xTrue;
-                    objects[i].rect.y += yTrue;
-                }
-                rectanglePlayer.x += xTrue;
-                rectanglePlayer.y += yTrue;
-                xTrue = 0;
-                yTrue = 0;
+                ResetPossition();
                 ConvertToFile();
-                menu = -1;
-            }
-            break;
+                break;
             case 6:
-            {
                 LoadFile();
                 menu = -1;
-            }
-            break;
+                break;
         }
         if (clickBuffer == 0) {
             switch (menu)
             {
                 case 0:
-                    MouseCollison(event, texturesMap, rectangles);
+                    MouseCollison(event, mapObjects);
                     break;
                 case 1:
-                    MouseCollison(event, texturesMobs, rectangles);
+                    MouseCollison(event, mobsObjects);
                     break;
                 case 2:
-                    MouseCollison(event, texturesEquipment, rectangles);
+                    MouseCollison(event, equipmentObjects);
                     break;
             }
         }
@@ -161,7 +157,7 @@ void LevelEditor::OnClick(SDL_Event event) {
     
 }
 
-void LevelEditor::MouseCollison(SDL_Event event, std::vector<SDL_Texture*>& textures, std::vector<SDL_Rect>& rectangles) {
+void LevelEditor::MouseCollison(SDL_Event event, std::vector<PleacedObject>& object) {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         SDL_GetMouseState(&mouse.x, &mouse.y);
         mouse.w = 1;
@@ -170,62 +166,12 @@ void LevelEditor::MouseCollison(SDL_Event event, std::vector<SDL_Texture*>& text
         {
             if (SimpleCollision(mouse, rectangles[i] ) == 1) {
                 clickRectangle = rectangles[i];
-                clickTexture = textures[i];
+                clickTexture = object[i].text;
+                currentName = object[i].name;
                 clicked = true;
                 clickBuffer += 10;
-                switch (menu) {
-                case 0:
-                    switch (i)
-                    {
-                    case 0:
-                        currentName = "grass";
-                        clickRectangle.w = 200;
-                        clickRectangle.h = 40;
-                        break;
-                    case 1:
-                        currentName = "platform";
-                        clickRectangle.w = 160;
-                        clickRectangle.h = 40;
-                        break;
-                    case 2:
-                        currentName = "pillar";
-                        clickRectangle.w = 40;
-                        clickRectangle.h = 160;
-                        break;
-                    case 3:
-                        currentName = "flag";
-                        clickRectangle.w = 40;
-                        clickRectangle.h = 100;
-                        break;
-                    }
-                    break;
-                case 1:
-                    switch (i)
-                    {
-                    case 0:
-                        currentName = "charger";
-                        clickRectangle.w = 30;
-                        clickRectangle.h = 30;
-                        break;
-                    case 1:
-                        currentName = "wolf";
-                        clickRectangle.w = 86;
-                        clickRectangle.h = 50;
-                        break;
-                    }
-                    break;
-                case 2:
-                    switch (i)
-                    {
-                    case 0:
-                        currentName = "shortSword";
-                        clickRectangle.w = 30;
-                        clickRectangle.h = 34;
-                        break;
-                    }
-                    break;
-
-                }
+                clickRectangle.w = object[i].rect.w;
+                clickRectangle.h = object[i].rect.h;
                 menu = -1;
             }
         }
@@ -344,6 +290,19 @@ void LevelEditor::Move(SDL_Event event) {
     }
 }
 
+void LevelEditor::ResetPossition() {
+    for (size_t i = 0; i < objects.size(); i++)
+    {
+        objects[i].rect.x += xTrue;
+        objects[i].rect.y += yTrue;
+    }
+    rectanglePlayer.x += xTrue;
+    rectanglePlayer.y += yTrue;
+    xTrue = 0;
+    yTrue = 0;
+    menu = -1;
+}
+
 void LevelEditor::Settings(SDL_Event event) {
     if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.scancode == SDL_SCANCODE_5) {
@@ -429,18 +388,18 @@ void LevelEditor::Render() {
         switch (menu)
         {
         case 0:
-            for (int i = 0; i < texturesMap.size(); i++) {
-                SDL_RenderCopy(renderer, texturesMap[i], NULL, &rectangles[i]);
+            for (int i = 0; i < mapObjects.size(); i++) {
+                SDL_RenderCopy(renderer, mapObjects[i].text, NULL, &rectangles[i]);
             }
         break;
         case 1:
-            for (int i = 0; i < texturesMobs.size(); i++) {
-                SDL_RenderCopy(renderer, texturesMobs[i], NULL, &rectangles[i]);
+            for (int i = 0; i < mobsObjects.size(); i++) {
+                SDL_RenderCopy(renderer, mobsObjects[i].text, NULL, &rectangles[i]);
             }
         break;
         case 2:
-            for (int i = 0; i < texturesEquipment.size(); i++) {
-                SDL_RenderCopy(renderer, texturesEquipment[i], NULL, &rectangles[i]);
+            for (int i = 0; i < equipmentObjects.size(); i++) {
+                SDL_RenderCopy(renderer, equipmentObjects[i].text, NULL, &rectangles[i]);
             }
         break;
         }
@@ -472,26 +431,26 @@ void LevelEditor::LoadFile() {
     if (levelFile.is_open()) {
         while (getline(levelFile, line)) {
                 objects.push_back(obj);
-                if (line == "grass") {
-                    objects[objects.size() - 1].text = texturesMap[0];
+                for (int i = 0; i < mapObjects.size(); i++)
+                {
+                    if (line == mapObjects[i].name) {
+                        objects[objects.size() - 1].text = mapObjects[i].text;
+                        break;
+                    }
                 }
-                else if (line == "platform") {
-                    objects[objects.size() - 1].text = texturesMap[1];
+                for (int i = 0; i < mobsObjects.size(); i++)
+                {
+                    if (line == mobsObjects[i].name) {
+                        objects[objects.size() - 1].text = mobsObjects[i].text;
+                        break;
+                    }
                 }
-                else if (line == "pillar") {
-                    objects[objects.size() - 1].text = texturesMap[2];
-                }
-                else if (line == "flag") {
-                    objects[objects.size() - 1].text = texturesMap[3];
-                }
-                else if (line == "charger") {
-                    objects[objects.size() - 1].text = texturesMobs[0];
-                }
-                else if (line == "wolf") {
-                    objects[objects.size() - 1].text = texturesMobs[1];
-                }
-                else if (line == "shortSword") {
-                    objects[objects.size() - 1].text = texturesEquipment[0];
+                for (int i = 0; i < equipmentObjects.size(); i++)
+                {
+                    if (line == equipmentObjects[i].name) {
+                        objects[objects.size() - 1].text = equipmentObjects[i].text;
+                        break;
+                    }
                 }
 
                 objects[objects.size() - 1].name = line;
@@ -532,16 +491,16 @@ void LevelEditor::ConvertToFile() {
 LevelEditor::~LevelEditor() {
     delete ui;
 
-    for (size_t i = 0; i < texturesMap.size(); ++i) {
-        SDL_DestroyTexture(texturesMap[i]);
+    for (size_t i = 0; i < mapObjects.size(); ++i) {
+        SDL_DestroyTexture(mapObjects[i].text);
     }
 
-    for (size_t i = 0; i < texturesMobs.size(); ++i) {
-        SDL_DestroyTexture(texturesMobs[i]);
+    for (size_t i = 0; i < mobsObjects.size(); ++i) {
+        SDL_DestroyTexture(mobsObjects[i].text);
     }
 
-    for (size_t i = 0; i < texturesEquipment.size(); ++i) {
-        SDL_DestroyTexture(texturesEquipment[i]);
+    for (size_t i = 0; i < equipmentObjects.size(); ++i) {
+        SDL_DestroyTexture(equipmentObjects[i].text);
     }
 
     SDL_DestroyTexture(texturePlayer);
