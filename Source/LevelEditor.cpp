@@ -113,14 +113,14 @@ void LevelEditor::OnClick(SDL_Event event) {
                     posX += 200;
                 }
                 break;
-            case 4:
+            case 4://Reset
                 ResetPossition();
                 break;
-            case 5:
+            case 5://Create
                 ResetPossition();
                 ConvertToFile();
                 break;
-            case 6:
+            case 6://Load
                 LoadFile();
                 menu = -1;
                 break;
@@ -224,7 +224,6 @@ void LevelEditor::UpdateKeyboard(SDL_Event event) {
                 }
             }
         }
-
     }
 }
 
@@ -249,7 +248,6 @@ void LevelEditor::DeleteObject(SDL_Event event) {
             }
         }
     }
-    
 }
 
 void LevelEditor::Move(SDL_Event event) {

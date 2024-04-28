@@ -29,7 +29,7 @@ void Equipment::LoadEquipment() {
 	int yCord = 0;
 	if (levelFile.is_open()) {
 		while (getline(levelFile, line)) {
-			if (line == "charger") {
+			if (line == "shortSword") {
 				ShortSwords.push_back(tempShortSword);
 				getline(levelFile, line);
 				ShortSwords[ShortSwords.size() - 1].GetRectangle()->x = std::stoi(line);
