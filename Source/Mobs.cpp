@@ -14,37 +14,37 @@ Mobs::Mobs(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 }
 
-SDL_Rect* Wolf::GetRectangle() {
+SDL_Rect* Enemy::GetRectangle() {
 	return &rectangle;
 }
 
-int Wolf::getAnimation() {
+int Enemy::getAnimation() {
 	return animation;
 }
 
 
-void Wolf::setAnimation(int temp) {
+void Enemy::setAnimation(int temp) {
 	animation = temp;
 }
 
 
-int Wolf::getHitPoints() {
+int Enemy::getHitPoints() {
 	return hitPoints;
 }
 
 
-void Wolf::setHitPoints(int temp) {
+void Enemy::setHitPoints(int temp) {
 	hitPoints = temp;
 }
 
-void Wolf::setColison(bool value, int index) {
+void Enemy::setColison(bool value, int index) {
 	if (index < 4) {
 		colision[index] = value;
 	}
 
 }
 
-bool Wolf::getColison(int index) {
+bool Enemy::getColison(int index) {
 	if (index < 4) {
 		return colision[index];
 	}
@@ -66,23 +66,15 @@ void Wolf::Movement(Player* player, Map* map) {
 	else
 	{
 		cProj->MoveProjectlile();
-		for (int i = 0; i < map->getPlatform().size(); i++)
+		for (int i = 0; i < map->getMapObjects().size(); i++)
 		{
-			if (SimpleCollision(*cProj->GetRectangle(), *map->getPlatform()[i].GetRectangle()) == 1)
+			if (SimpleCollision(*cProj->GetRectangle(), *map->getMapObjects()[i].GetRectangle()) == 1)
 			{
 				cProj->SetTimer(50);
 				break;
 			}
 		}
 
-		for (int i = 0; i < map->getPillar().size(); i++)
-		{
-			if (SimpleCollision(*cProj->GetRectangle(), *map->getPillar()[i].GetRectangle()) == 1)
-			{
-				cProj->SetTimer(50);
-				break;
-			}
-		}
 
 		if (SimpleCollision(*cProj->GetRectangle(), *player->GetRectangle()) == 1) {
 			cProj->SetTimer(50);
@@ -134,43 +126,6 @@ void Wolf::Movement(Player* player, Map* map) {
 		}
 		break;
 	}
-}
-
-SDL_Rect* Charger::GetRectangle() {
-    return &rectangle;
-}
-
-int Charger::getAnimation() {
-	return animation;
-}
-
-
-void Charger::setAnimation(int temp) {
-	animation = temp;
-}
-
-
-int Charger::getHitPoints() {
-	return hitPoints;
-}
-
-
-void Charger::setHitPoints(int temp) {
-	hitPoints = temp;
-}
-
-void Charger::setColison(bool value, int index) {
-	if (index < 4) {
-		colision[index] = value;
-	}
-
-}
-
-bool Charger::getColison(int index) {
-	if (index < 4) {
-		return colision[index];
-	}
-
 }
 
 void Charger::Movement() {
@@ -270,9 +225,9 @@ void Mobs::DetectColison(Player* player,Map *map) {
 		Chargers[i].setColison(false, 1);
 		Chargers[i].setColison(false, 2);
 
-		for (int j = 0; j < map->getPlatform().size(); j++)
+		for (int j = 0; j < map->getMapObjects().size(); j++)
 		{
-			switch (Collision(*Chargers[i].GetRectangle(), *map->getPlatform()[j].GetRectangle()))
+			switch (Collision(*Chargers[i].GetRectangle(), *map->getMapObjects()[j].GetRectangle()))
 			{
 			case 1:
 				Chargers[i].setColison(true, 0);
@@ -286,9 +241,9 @@ void Mobs::DetectColison(Player* player,Map *map) {
 			}
 		}
 
-		for (int j = 0; j < map->getPillar().size(); j++)
+		for (int j = 0; j < map->getInvWalls().size(); j++)
 		{
-			switch (Collision(*Chargers[i].GetRectangle(), *map->getPillar()[j].GetRectangle()))
+			switch (Collision(*Chargers[i].GetRectangle(), *map->getInvWalls()[j].GetRectangle()))
 			{
 			case 1:
 				Chargers[i].setColison(true, 0);
@@ -302,21 +257,6 @@ void Mobs::DetectColison(Player* player,Map *map) {
 			}
 		}
 
-		for (int j = 0; j < map->getFloor().size(); j++)
-		{
-			switch (Collision(*Chargers[i].GetRectangle(), *map->getFloor()[j].GetRectangle()))
-			{
-			case 1:
-				Chargers[i].setColison(true, 0);
-				break;
-			case 2:
-				Chargers[i].setColison(true, 1);
-				break;
-			case 3:
-				Chargers[i].setColison(true, 2);
-				break;
-			}
-		}
 
 		if (Chargers[i].getColison(1) == false) {
 			Chargers[i].GetRectangle()->y += 2;
@@ -350,9 +290,9 @@ void Mobs::DetectColison(Player* player,Map *map) {
 		Wolfs[i].setColison(false, 1);
 		Wolfs[i].setColison(false, 2);
 
-		for (int j = 0; j < map->getPlatform().size(); j++)
+		for (int j = 0; j < map->getMapObjects().size(); j++)
 		{
-			switch (Collision(*Wolfs[i].GetRectangle(), *map->getPlatform()[j].GetRectangle()))
+			switch (Collision(*Wolfs[i].GetRectangle(), *map->getMapObjects()[j].GetRectangle()))
 			{
 			case 1:
 				Wolfs[i].setColison(true, 0);
@@ -366,24 +306,9 @@ void Mobs::DetectColison(Player* player,Map *map) {
 			}
 		}
 
-		for (int j = 0; j < map->getPillar().size(); j++)
+		for (int j = 0; j < map->getInvWalls().size(); j++)
 		{
-			switch (Collision(*Wolfs[i].GetRectangle(), *map->getPillar()[j].GetRectangle()))
-			{
-			case 1:
-				Wolfs[i].setColison(true, 0);
-				break;
-			case 2:
-				Wolfs[i].setColison(true, 1);
-				break;
-			case 3:
-				Wolfs[i].setColison(true, 2);
-				break;
-			}
-		}
-		for (int j = 0; j < map->getFloor().size(); j++)
-		{
-			switch (Collision(*Wolfs[i].GetRectangle(), *map->getFloor()[j].GetRectangle()))
+			switch (Collision(*Wolfs[i].GetRectangle(), *map->getInvWalls()[j].GetRectangle()))
 			{
 			case 1:
 				Wolfs[i].setColison(true, 0);

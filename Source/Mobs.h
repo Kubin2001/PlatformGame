@@ -11,46 +11,16 @@ class Player;
 
 class Map;
 
-class Wolf {
-private:
-	CollisonProjectile* cProj;
-	SDL_Rect rectangle;
-	int agroo = 0;
-	int movementtype = 1;
-	int animation = 2;
-	int hitPoints = 20;
-	bool colision[4] = { 0,0,0,0 };
-
-public:
-	SDL_Rect* GetRectangle();
-
-	void Movement(Player* player, Map* map);
-
-	int getAnimation();
-
-	void setAnimation(int temp);
-
-	int getHitPoints();
-
-	void setHitPoints(int temp);
-
-	void setColison(bool value, int index);
-
-	bool getColison(int index);
-};
-
-class Charger{
-	private:
+class Enemy {
+	protected:
 		SDL_Rect rectangle;
 		int movementtype = 1;
 		int animation = 2;
-		int hitPoints = 10;
+		int hitPoints = 20;
 		bool colision[4] = { 0,0,0,0 };
 
 	public:
 		SDL_Rect* GetRectangle();
-
-		void Movement();
 
 		int getAnimation();
 
@@ -63,6 +33,27 @@ class Charger{
 		void setColison(bool value, int index);
 
 		bool getColison(int index);
+
+};
+
+class Wolf : public Enemy{
+	private:
+		CollisonProjectile* cProj;
+		int agroo = 0;
+
+	public:
+		Wolf() {
+			hitPoints = 20;
+		}
+		void Movement(Player* player, Map* map);
+};
+
+class Charger : public Enemy{
+	public:
+		Charger() {
+			hitPoints = 10;
+		}
+		void Movement();
 };
 
 

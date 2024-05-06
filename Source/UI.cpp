@@ -34,40 +34,15 @@ std::vector<Hearth>& UI::getHP() {return HP;}
 void UI::Render() {
     if (windowtype == 1) {
         RenderButton();
-        switch (menuType) {
-            case 0:
-                for (int  i = 0; i < Buttons.size(); i++)
-                {
-                    int size = Buttons[i].GetRectangle()->w / Buttons[i].GetText().length() - 2;
-                    font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, size, size, size + 2);
+        for (int  i = 0; i < Buttons.size(); i++)
+        {
+            int size = Buttons[i].GetRectangle()->w / Buttons[i].GetText().length() - 2;
+            font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, size, size, size + 2);
                     
-
-                }
-                break;
-            case 1:
-                for (int i = 0; i < Buttons.size(); i++)
-                {
-                    font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y,20,20,21);
-                }  
-                break;
-
-            case 2:
-                for (int i = 0; i < Buttons.size(); i++)
-                {
-                    font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, 20, 20, 21);
-                }
-                break;
-
-            case 3:
-                for (int i = 0; i < Buttons.size(); i++)
-                {
-                    font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, 15, 15, 16);
-                }
-                break;
 
         }
     }
-    if (windowtype == 2) {
+    else if (windowtype == 2) {
         RenderHP();
     }
 

@@ -35,9 +35,9 @@ void Map::SetTextureFlag(SDL_Texture* temptex) {textureFlag = temptex;}
 //getters and setters
 
 void Map::DetectColison(Player* player,UI *ui) {
-	for (int i = 0; i < Platforms.size(); i++)
+	for (int i = 0; i < MapObjects.size(); i++)
 	{
-		switch (Collision(*player->GetRectangle(), *Platforms[i].GetRectangle()))
+		switch (Collision(*player->GetRectangle(), *MapObjects[i].GetRectangle()))
 		{
 		case 1:
 			player->setColison(true, 0);
@@ -55,25 +55,6 @@ void Map::DetectColison(Player* player,UI *ui) {
 		}
 	}
 
-	for (int i = 0; i < Pillars.size(); i++)
-	{
-		switch (Collision(*player->GetRectangle(), *Pillars[i].GetRectangle()))
-		{
-		case 1:
-			player->setColison(true, 0);
-			break;
-		case 2:
-			player->setColison(true, 1);
-			break;
-		case 3:
-			player->setColison(true, 2);
-			break;
-		case 4:
-			player->setColison(true, 3);
-			player->setJumpBuffer(20);
-			break;
-		}
-	}
 	for (int i = 0; i < Flags.size(); i++)
 	{
 		switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
@@ -85,153 +66,103 @@ void Map::DetectColison(Player* player,UI *ui) {
 			break;
 		}
 	}
-
-	for (int i = 0; i < Floors.size(); i++)
-	{
-		switch (Collision(*player->GetRectangle(), *Floors[i].GetRectangle()))
-		{
-		case 1:
-			player->setColison(true, 0);
-			break;
-		case 2:
-			player->setColison(true, 1);
-			break;
-		case 3:
-			player->setColison(true, 2);
-			break;
-		case 4:
-			player->setColison(true, 3);
-			player->setJumpBuffer(20);
-			break;
-		}
-	}
 }
 
 void Map::MoveMap(const Uint8* state,Player *player) {
 	if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-		for (int i = 0; i < Platforms.size(); i++)
+		for (int i = 0; i < MapObjects.size(); i++)
 		{
-			Platforms[i].GetRectangle()->x-=4;
-		}
-		for (int i = 0; i < Pillars.size(); i++)
-		{
-			Pillars[i].GetRectangle()->x -= 4;
+			MapObjects[i].GetRectangle()->x-=4;
 		}
 		for (int i = 0; i < Flags.size(); i++)
 		{
 			Flags[i].GetRectangle()->x -= 4;
 		}
-		for (int i = 0; i < Floors.size(); i++)
+		for (int i = 0; i < InvWalls.size(); i++)
 		{
-			Floors[i].GetRectangle()->x -= 4;
+			InvWalls[i].GetRectangle()->x -= 4;
 		}
 		player->setanimation(1);
 	}
 	
 
 	if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-		for (int i = 0; i < Platforms.size(); i++)
+		for (int i = 0; i < MapObjects.size(); i++)
 		{
-			Platforms[i].GetRectangle()->x += 4;
-		}
-		for (int i = 0; i < Pillars.size(); i++)
-		{
-			Pillars[i].GetRectangle()->x += 4;
+			MapObjects[i].GetRectangle()->x += 4;
 		}
 		for (int i = 0; i < Flags.size(); i++)
 		{
 			Flags[i].GetRectangle()->x += 4;
 		}
-		for (int i = 0; i < Floors.size(); i++)
+		for (int i = 0; i < InvWalls.size(); i++)
 		{
-			Floors[i].GetRectangle()->x += 4;
+			InvWalls[i].GetRectangle()->x += 4;
 		}
 		player->setanimation(2);
 	}
 
 	if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-		for (int i = 0; i < Platforms.size(); i++)
+		for (int i = 0; i < MapObjects.size(); i++)
 		{
-			Platforms[i].GetRectangle()->y -= 5;
-		}
-		for (int i = 0; i < Pillars.size(); i++)
-		{
-			Pillars[i].GetRectangle()->y -= 5;
+			MapObjects[i].GetRectangle()->y -= 5;
 		}
 		for (int i = 0; i < Flags.size(); i++)
 		{
 			Flags[i].GetRectangle()->y -= 5;
 		}
-		for (int i = 0; i < Floors.size(); i++)
+		for (int i = 0; i < InvWalls.size(); i++)
 		{
-			Floors[i].GetRectangle()->y -= 5;
+			InvWalls[i].GetRectangle()->y -= 5;
 		}
 	}
 	if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-		for (int i = 0; i < Platforms.size(); i++)
+		for (int i = 0; i < MapObjects.size(); i++)
 		{
-			Platforms[i].GetRectangle()->y += 5;
+			MapObjects[i].GetRectangle()->y += 5;
 		}
-		for (int i = 0; i < Pillars.size(); i++)
-		{
-			Pillars[i].GetRectangle()->y += 5;
-		}
+
 		for (int i = 0; i < Flags.size(); i++)
 		{
 			Flags[i].GetRectangle()->y += 5;
 		}
-		for (int i = 0; i < Floors.size(); i++)
+		for (int i = 0; i < InvWalls.size(); i++)
 		{
-			Floors[i].GetRectangle()->y += 5;
+			InvWalls[i].GetRectangle()->y += 5;
 		}
 	}
 }
 
-void Map::CreateLevel() {
-	Pillar pillar;
-	Platform platform;
+void Map::CreateLevel(){
+	MapObject mapObject;
 	Flag flag;
-	Floor floor;
+	InvWall invWall;
 	std::ifstream levelFile(levelName);
 	std::string line;
 	if (levelFile.is_open()) {
 		while (getline(levelFile, line)) {
-			if (line == "platform") {
-				Platforms.push_back(platform);
+			if (line == "platform" || line == "pillar" || line == "grass") {
+				MapObjects.push_back(mapObject);
+				if (line == "platform") {
+					MapObjects[MapObjects.size() - 1].SetTexture(texturePlatform);
+				}
+				else if (line == "pillar") {
+					MapObjects[MapObjects.size() - 1].SetTexture(texturePillar);
+				}
+				else if (line == "grass") {
+					MapObjects[MapObjects.size() - 1].SetTexture(textureFloor);
+				}
 				getline(levelFile, line);
-				Platforms[Platforms.size() - 1].GetRectangle()->x = std::stoi(line);
+				MapObjects[MapObjects.size() - 1].GetRectangle()->x = std::stoi(line);
 				getline(levelFile, line);
-				Platforms[Platforms.size() - 1].GetRectangle()->y = std::stoi(line);
+				MapObjects[MapObjects.size() - 1].GetRectangle()->y = std::stoi(line);
 				getline(levelFile, line);
-				Platforms[Platforms.size() - 1].GetRectangle()->w = std::stoi(line);
+				MapObjects[MapObjects.size() - 1].GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
-				Platforms[Platforms.size() - 1].GetRectangle()->h = std::stoi(line);
-			}
-			if (line == "pillar") {
-				Pillars.push_back(pillar);
-				getline(levelFile, line);
-				Pillars[Pillars.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Pillars[Pillars.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Pillars[Pillars.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Pillars[Pillars.size() - 1].GetRectangle()->h = std::stoi(line);
+				MapObjects[MapObjects.size() - 1].GetRectangle()->h = std::stoi(line);
 
 			}
-			if (line == "grass") {
-				Floors.push_back(floor);
-				getline(levelFile, line);
-				Floors[Floors.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Floors[Floors.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Floors[Floors.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Floors[Floors.size() - 1].GetRectangle()->h = std::stoi(line);
-
-			}
-			if (line == "flag") {
+			else if (line == "flag") {
 				Flags.push_back(flag);
 				getline(levelFile, line);
 				Flags[Flags.size() - 1].GetRectangle()->x = std::stoi(line);
@@ -241,7 +172,17 @@ void Map::CreateLevel() {
 				Flags[Flags.size() - 1].GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
 				Flags[Flags.size() - 1].GetRectangle()->h = std::stoi(line);
-
+			}
+			else if (line == "invWall") {
+				InvWalls.push_back(invWall);
+				getline(levelFile, line);
+				InvWalls[InvWalls.size() - 1].GetRectangle()->x = std::stoi(line);
+				getline(levelFile, line);
+				InvWalls[InvWalls.size() - 1].GetRectangle()->y = std::stoi(line);
+				getline(levelFile, line);
+				InvWalls[InvWalls.size() - 1].GetRectangle()->w = std::stoi(line);
+				getline(levelFile, line);
+				InvWalls[InvWalls.size() - 1].GetRectangle()->h = std::stoi(line);
 			}
 		}
 	}
@@ -251,17 +192,10 @@ void Map::CreateLevel() {
 	}
 }
 
-void Map::RenderPlatforms() {
-	for (int i = 0; i < Platforms.size(); i++)
+void Map::RenderObjects() {
+	for (int i = 0; i < MapObjects.size(); i++)
 	{
-		SDL_RenderCopy(renderer, texturePlatform, NULL, Platforms[i].GetRectangle());
-	}
-}
-
-void Map::RenderPillar() {
-	for (int i = 0; i < Pillars.size(); i++)
-	{
-		SDL_RenderCopy(renderer, texturePillar, NULL, Pillars[i].GetRectangle());
+		SDL_RenderCopy(renderer, MapObjects[i].GetTexture(), NULL, MapObjects[i].GetRectangle());
 	}
 }
 
@@ -272,57 +206,48 @@ void Map::RenderFlag() {
 	}
 }
 
-void Map::RenderFloor() {
-	for (int i = 0; i < Floors.size(); i++)
-	{
-		SDL_RenderCopy(renderer, textureFloor, NULL, Floors[i].GetRectangle());
-	}
-}
-
 void Map::Render() {
-	RenderFloor();
-	RenderPlatforms();
-	RenderPillar();
+	RenderObjects();
 	RenderFlag();
-	RenderFloor();
+	//for (int i = 0; i < InvWalls.size(); i++){
+	//	SDL_RenderCopy(renderer, textureInvWall, NULL, InvWalls[i].GetRectangle());
+	//}
 }
 
 
-SDL_Rect* Platform::GetRectangle() {
+SDL_Rect* MapObject::GetRectangle() {
 	return &rectangle;
 }
 
 
-SDL_Rect* Pillar::GetRectangle() {
-	return &rectangle;
-}
 
 SDL_Rect* Flag::GetRectangle() {
 	return &rectangle;
 }
 
-SDL_Rect* Floor::GetRectangle() {
+SDL_Rect* InvWall::GetRectangle() {
 	return &rectangle;
 }
 
 
-std::vector<Pillar>& Map::getPillar() {
-	return Pillars;
+std::vector<MapObject>& Map::getMapObjects() {
+	return MapObjects;
 }
 
 
-std::vector<Platform>& Map::getPlatform() {
-	return Platforms;
-}
 
 std::vector<Flag>& Map::getFlag() {
 	return Flags;
 }
 
-std::vector<Floor>& Map::getFloor() {
-	return Floors;
+std::vector<InvWall>& Map::getInvWalls() {
+	return InvWalls;
 }
 
+
+SDL_Texture* MapObject::GetTexture() { return texture; }
+
+void MapObject::SetTexture(SDL_Texture* temptex) { texture = temptex; }
 
 Map::~Map() {
 	SDL_DestroyTexture(textureFloor);

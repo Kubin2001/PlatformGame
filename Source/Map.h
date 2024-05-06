@@ -8,13 +8,19 @@
 class Player;
 
 
-class Floor {
+class MapObject {
 	private:
 		SDL_Rect rectangle;
+		SDL_Texture* texture;
 
 	public:
 		SDL_Rect* GetRectangle();
+
+		SDL_Texture* GetTexture();
+
+		void SetTexture(SDL_Texture* temptex);
 };
+
 
 class Flag {
 	private:
@@ -24,7 +30,7 @@ class Flag {
 		SDL_Rect* GetRectangle();
 };
 
-class Platform {
+class InvWall {
 	private:
 		SDL_Rect rectangle;
 
@@ -32,75 +38,63 @@ class Platform {
 		SDL_Rect* GetRectangle();
 };
 
-class Pillar {
-	private:
-		SDL_Rect rectangle;
-
-	public:
-		SDL_Rect* GetRectangle();
-};
 
 class Map {
-private:
-	SDL_Renderer* renderer = nullptr;
+	private:
+		SDL_Renderer* renderer = nullptr;
 
-	std::vector<Platform> Platforms;
-	std::vector<Pillar> Pillars;
-	std::vector<Flag> Flags;
-	std::vector<Floor> Floors;
+		std::vector<MapObject> MapObjects;
+		std::vector<Flag> Flags;
+		std::vector<InvWall> InvWalls;
 
-	SDL_Texture* texturePlatform = nullptr;
-	SDL_Texture* texturePillar = nullptr;
-	SDL_Texture* textureFlag = nullptr;
-	SDL_Texture* textureFloor = nullptr;
+		SDL_Texture* texturePlatform = nullptr;
+		SDL_Texture* texturePillar = nullptr;
+		SDL_Texture* textureFlag = nullptr;
+		SDL_Texture* textureFloor = nullptr;
 	
-public:
-	Map(SDL_Renderer* renderer);
+	public:
+		//SDL_Texture* textureInvWall = nullptr;
+		Map(SDL_Renderer* renderer);
 
-	//getters and setters
+		//getters and setters
 
-	SDL_Texture* GetTextureFloor();
+		SDL_Texture* GetTextureFloor();
 
-	void SetTextureFloor(SDL_Texture* temptex);
+		void SetTextureFloor(SDL_Texture* temptex);
 
-	SDL_Texture* GetTexturePLatform();
+		SDL_Texture* GetTexturePLatform();
 
-	void SetTexturePlatform(SDL_Texture* temptex);
+		void SetTexturePlatform(SDL_Texture* temptex);
 
-	SDL_Texture* GetTexturePilar();
+		SDL_Texture* GetTexturePilar();
 
-	void SetTexturePilar(SDL_Texture* temptex);
+		void SetTexturePilar(SDL_Texture* temptex);
 
-	SDL_Texture* GetTextureFlag();
+		SDL_Texture* GetTextureFlag();
 
-	void SetTextureFlag(SDL_Texture* temptex);
+		void SetTextureFlag(SDL_Texture* temptex);
 
-	SDL_Rect* GetRectangle(int index);
-	//getters and setters
+		SDL_Rect* GetRectangle(int index);
+		//getters and setters
 
-	void Render();
+		void Render();
 
-	void DetectColison(Player* player,UI *ui);
+		void DetectColison(Player* player,UI *ui);
 
-	void MoveMap(const Uint8* state,Player *player);
+		void MoveMap(const Uint8* state,Player *player);
 
-	void RenderFloor();
+		void CreateLevel();
 
-	void CreateLevel();
+		void RenderObjects();
 
-	void RenderPlatforms();
+		void RenderFlag();
 
-	void RenderPillar();
+		std::vector<MapObject> &getMapObjects();
 
-	void RenderFlag();
+		std::vector<Flag> &getFlag();
 
-	std::vector<Pillar> &getPillar();
+		std::vector<InvWall>& getInvWalls();
 
-	std::vector<Platform> &getPlatform();
 
-	std::vector<Flag> &getFlag();
-
-	std::vector<Floor>&getFloor();
-
-	~Map();
+		~Map();
 };

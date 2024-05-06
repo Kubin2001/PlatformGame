@@ -37,6 +37,7 @@ void Game::Start() {
     {
         case 1:
             ui = new UI(renderer);
+            LoadTextures();
             ui->font->LoadText(40, 29, 29);
             ui->CreateButton();
             break;
@@ -47,6 +48,7 @@ void Game::Start() {
             mobs = new Mobs(renderer);
             player = new Player(renderer);
             equipment = new Equipment(renderer);
+            LoadTextures();
             map->CreateLevel();
             mobs->LoadMobs();
             ui->CreateHearths();
@@ -54,9 +56,9 @@ void Game::Start() {
             break;
         case 3:
             levelEditor = new LevelEditor(renderer);
+            LoadTextures();
             break;
     }
-    LoadTextures();
 
 }
 
@@ -74,6 +76,7 @@ void Game::LoadTextures() {
         map->SetTextureFloor(load("Textures/Terrain/grass.png", renderer));
         map->SetTexturePlatform(load("Textures/Terrain/platform.png", renderer));
         map->SetTexturePilar(load("Textures/Terrain/pillar.png", renderer));
+        //map->textureInvWall = load("Textures/Terrain/invWall.png", renderer);
         map->SetTextureFlag(load("Textures/Terrain/flag.png", renderer));
         mobs->SetTextureCharger(load("Textures/Mobs/charger.png", renderer));
         mobs->SetTextureWolf(load("Textures/Mobs/wolf.png", renderer));
