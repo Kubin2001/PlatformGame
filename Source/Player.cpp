@@ -192,13 +192,13 @@ void Player::Attack(const Uint8* state, Mobs* mobs) {
 			if (state[SDL_SCANCODE_SPACE]) {
 				attackBuffer = 60;
 				weapon->SetAnimation(2);
-				for (int i = 0; i < mobs->getChargers().size(); i++)
+				for (int i = 0; i < mobs->getEnemies().size(); i++)
 				{
-					if (SimpleCollision(*GetRectangle(), *mobs->getChargers()[i].GetRectangle()) == 1) {
+					if (SimpleCollision(*GetRectangle(), *mobs->getEnemies()[i]->GetRectangle()) == 1) {
 						std::cout << "XD";
-						mobs->getChargers()[i].setHitPoints(mobs->getChargers()[i].getHitPoints() - 10);
-						if (mobs->getChargers()[i].getHitPoints() < 1) {
-							mobs->getChargers().erase(mobs->getChargers().begin() + i);
+						mobs->getEnemies()[i]->setHitPoints(mobs->getEnemies()[i]->getHitPoints() - 10);
+						if (mobs->getEnemies()[i]->getHitPoints() < 1) {
+							mobs->getEnemies().erase(mobs->getEnemies().begin() + i);
 						}
 					}
 				}

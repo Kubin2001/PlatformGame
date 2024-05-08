@@ -22,16 +22,13 @@ int Enemy::getAnimation() {
 	return animation;
 }
 
-
 void Enemy::setAnimation(int temp) {
 	animation = temp;
 }
 
-
 int Enemy::getHitPoints() {
 	return hitPoints;
 }
-
 
 void Enemy::setHitPoints(int temp) {
 	hitPoints = temp;
@@ -128,7 +125,7 @@ void Wolf::Movement(Player* player, Map* map) {
 	}
 }
 
-void Charger::Movement() {
+void Charger::Movement(Player* player, Map* map) {
 	if (colision[0]) {
 		movementtype = 2;
 		animation = 1;
@@ -173,14 +170,11 @@ void Mobs::SetTextureWolf(SDL_Texture* temptex) {
 	textureWolf = temptex;
 }
 
-std::vector<Charger>& Mobs::getChargers() { return Chargers; }
+std::vector<Enemy*>& Mobs::getEnemies() { return Enemies; }
 
-std::vector<Wolf>& Mobs::getWolfs() { return Wolfs; }
 //getters and setters
 
 void Mobs::LoadMobs() {
-	Charger charger;
-	Wolf wolf;
 	std::ifstream levelFile(levelName);
 	std::string line;
 	int xCord = 0;
@@ -188,26 +182,28 @@ void Mobs::LoadMobs() {
 	if (levelFile.is_open()) {
 		while (getline(levelFile, line)) {
 			if (line == "charger") {
-				Chargers.push_back(charger);
+				Enemies.push_back(new Charger());
 				getline(levelFile, line);
-				Chargers[Chargers.size() - 1].GetRectangle()->x = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
 				getline(levelFile, line);
-				Chargers[Chargers.size() - 1].GetRectangle()->y = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->y = std::stoi(line);
 				getline(levelFile, line);
-				Chargers[Chargers.size() - 1].GetRectangle()->w = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
-				Chargers[Chargers.size() - 1].GetRectangle()->h = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
+				Enemies[Enemies.size() - 1]->texture = textureCharger;
 			}
 			if (line == "wolf") {
-				Wolfs.push_back(wolf);
+				Enemies.push_back(new Wolf());
 				getline(levelFile, line);
-				Wolfs[Wolfs.size() - 1].GetRectangle()->x = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
 				getline(levelFile, line);
-				Wolfs[Wolfs.size() - 1].GetRectangle()->y = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->y = std::stoi(line);
 				getline(levelFile, line);
-				Wolfs[Wolfs.size() - 1].GetRectangle()->w = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
-				Wolfs[Wolfs.size() - 1].GetRectangle()->h = std::stoi(line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
+				Enemies[Enemies.size() - 1]->texture = textureWolf;
 
 			}
 		}
@@ -219,51 +215,49 @@ void Mobs::LoadMobs() {
 }
 
 void Mobs::DetectColison(Player* player,Map *map) {
-	for (int i = 0; i < Chargers.size(); i++)
+	for (int i = 0; i < Enemies.size(); i++)
 	{
-		Chargers[i].setColison(false, 0);
-		Chargers[i].setColison(false, 1);
-		Chargers[i].setColison(false, 2);
+		Enemies[i]->setColison(false, 0);
+		Enemies[i]->setColison(false, 1);
+		Enemies[i]->setColison(false, 2);
 
 		for (int j = 0; j < map->getMapObjects().size(); j++)
 		{
-			switch (Collision(*Chargers[i].GetRectangle(), *map->getMapObjects()[j].GetRectangle()))
+			switch (Collision(*Enemies[i]->GetRectangle(), *map->getMapObjects()[j].GetRectangle()))
 			{
 			case 1:
-				Chargers[i].setColison(true, 0);
+				Enemies[i]->setColison(true, 0);
 				break;
 			case 2:
-				Chargers[i].setColison(true, 1);
+				Enemies[i]->setColison(true, 1);
 				break;
 			case 3:
-				Chargers[i].setColison(true, 2);
+				Enemies[i]->setColison(true, 2);
 				break;
 			}
 		}
 
 		for (int j = 0; j < map->getInvWalls().size(); j++)
 		{
-			switch (Collision(*Chargers[i].GetRectangle(), *map->getInvWalls()[j].GetRectangle()))
+			switch (Collision(*Enemies[i]->GetRectangle(), *map->getInvWalls()[j].GetRectangle()))
 			{
 			case 1:
-				Chargers[i].setColison(true, 0);
+				Enemies[i]->setColison(true, 0);
 				break;
 			case 2:
-				Chargers[i].setColison(true, 1);
+				Enemies[i]->setColison(true, 1);
 				break;
 			case 3:
-				Chargers[i].setColison(true, 2);
+				Enemies[i]->setColison(true, 2);
 				break;
 			}
 		}
 
-
-		if (Chargers[i].getColison(1) == false) {
-			Chargers[i].GetRectangle()->y += 2;
+		if (Enemies[i]->getColison(1) == false) {
+			Enemies[i]->GetRectangle()->y += 2;
 		}
 
-
-		switch (Collision(*player->GetRectangle(), *Chargers[i].GetRectangle()))
+		switch (Collision(*player->GetRectangle(), *Enemies[i]->GetRectangle()))
 		{
 			case 1:
 				player->setColison(true, 0);
@@ -272,175 +266,73 @@ void Mobs::DetectColison(Player* player,Map *map) {
 			case 2:
 				player->setColison(true, 1);
 				player->setJumpBuffer(40);
-				Chargers[i].setHitPoints(Chargers[i].getHitPoints() - 10);
-				if (Chargers[i].getHitPoints() < 1) {
-					Chargers.erase(Chargers.begin() + i);
+				Enemies[i]->setHitPoints(Enemies[i]->getHitPoints() - 10);
+				if (Enemies[i]->getHitPoints() < 1) {
+					delete Enemies[i];
+					Enemies.erase(Enemies.begin() + i);
 				}
 				break;
 			case 3:
 				player->setColison(true, 2);
 				player->SetDamage(true);
 				break;
-			}
-	}
-
-	for (int i = 0; i < Wolfs.size(); i++)
-	{
-		Wolfs[i].setColison(false, 0);
-		Wolfs[i].setColison(false, 1);
-		Wolfs[i].setColison(false, 2);
-
-		for (int j = 0; j < map->getMapObjects().size(); j++)
-		{
-			switch (Collision(*Wolfs[i].GetRectangle(), *map->getMapObjects()[j].GetRectangle()))
-			{
-			case 1:
-				Wolfs[i].setColison(true, 0);
-				break;
-			case 2:
-				Wolfs[i].setColison(true, 1);
-				break;
-			case 3:
-				Wolfs[i].setColison(true, 2);
-				break;
-			}
-		}
-
-		for (int j = 0; j < map->getInvWalls().size(); j++)
-		{
-			switch (Collision(*Wolfs[i].GetRectangle(), *map->getInvWalls()[j].GetRectangle()))
-			{
-			case 1:
-				Wolfs[i].setColison(true, 0);
-				break;
-			case 2:
-				Wolfs[i].setColison(true, 1);
-				break;
-			case 3:
-				Wolfs[i].setColison(true, 2);
-				break;
-			}
-		}
-
-		if (Wolfs[i].getColison(1) == false) {
-			Wolfs[i].GetRectangle()->y += 2;
-		}
-
-
-		switch (Collision(*player->GetRectangle(), *Wolfs[i].GetRectangle()))
-		{
-		case 1:
-			player->setColison(true, 0);
-			player->SetDamage(true);
-			break;
-		case 2:
-			player->setColison(true, 1);
-			player->setJumpBuffer(40);
-			Wolfs[i].setHitPoints(Wolfs[i].getHitPoints() - 10);
-			if (Wolfs[i].getHitPoints() < 1) {
-				Wolfs.erase(Wolfs.begin() + i);
-			}
-			break;
-		case 3:
-			player->setColison(true, 2);
-			player->SetDamage(true);
-			break;
 		}
 	}
 }
 
 void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map) {
 	if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-		for (int i = 0; i < Chargers.size(); i++)
+		for (int i = 0; i < Enemies.size(); i++)
 		{
-			Chargers[i].GetRectangle()->x -= 4;
-		}
-		for (int i = 0; i < Wolfs.size(); i++)
-		{
-			Wolfs[i].GetRectangle()->x -= 4;
+			Enemies[i]->GetRectangle()->x -= 4;
 		}
 	}
 	if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-		for (int i = 0; i < Chargers.size(); i++)
+		for (int i = 0; i < Enemies.size(); i++)
 		{
-			Chargers[i].GetRectangle()->x += 4;
-		}
-		for (int i = 0; i < Wolfs.size(); i++)
-		{
-			Wolfs[i].GetRectangle()->x += 4;
+			Enemies[i]->GetRectangle()->x += 4;
 		}
 	}
 
 	if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-		for (int i = 0; i < Chargers.size(); i++)
+		for (int i = 0; i < Enemies.size(); i++)
 		{
-			Chargers[i].GetRectangle()->y -= 5;
-		}
-		for (int i = 0; i < Wolfs.size(); i++)
-		{
-			Wolfs[i].GetRectangle()->y -= 5;
-		}
-		
+			Enemies[i]->GetRectangle()->y -= 5;
+		}	
 	}
 	if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-		for (int i = 0; i < Chargers.size(); i++)
+		for (int i = 0; i < Enemies.size(); i++)
 		{
-			Chargers[i].GetRectangle()->y += 5;
-		}
-		for (int i = 0; i < Wolfs.size(); i++)
-		{
-			Wolfs[i].GetRectangle()->y += 5;
+			Enemies[i]->GetRectangle()->y += 5;
 		}
 	}
-	for (int i = 0; i < Chargers.size(); i++)
+	for (int i = 0; i < Enemies.size(); i++)
 	{
-		Chargers[i].Movement();
+		Enemies[i]->Movement(player,map);
 	}
 
-	for (int i = 0; i < Wolfs.size(); i++)
-	{
-		Wolfs[i].Movement(player,map);
-	}
 }
 
 
-void Mobs::RenderChargers() {
-	for (int i = 0; i < Chargers.size(); i++)
+void Mobs::RenderEnemies() {
+	for (int i = 0; i < Enemies.size(); i++)
 	{
-		switch (Chargers[i].getAnimation())
+		switch (Enemies[i]->getAnimation())
 		{
 			case 2:
-				SDL_RenderCopy(renderer, textureCharger, NULL, Chargers[i].GetRectangle());
+				SDL_RenderCopy(renderer, Enemies[i]->texture, NULL, Enemies[i]->GetRectangle());
 				break;
 
 			case 1:
 				SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-				SDL_RenderCopyEx(renderer, textureCharger, NULL, Chargers[i].GetRectangle(), 0.0, NULL, flip);
+				SDL_RenderCopyEx(renderer, Enemies[i]->texture, NULL, Enemies[i]->GetRectangle(), 0.0, NULL, flip);
 				break;
-		}
-	}
-}
-
-void Mobs::RenderWolfs() {
-	for (int i = 0; i < Wolfs.size(); i++)
-	{
-		switch (Wolfs[i].getAnimation())
-		{
-		case 2:
-			SDL_RenderCopy(renderer, textureWolf, NULL, Wolfs[i].GetRectangle());
-			break;
-
-		case 1:
-			SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-			SDL_RenderCopyEx(renderer, textureWolf, NULL, Wolfs[i].GetRectangle(), 0.0, NULL, flip);
-			break;
 		}
 	}
 }
 
 void Mobs::Render() {
-	RenderChargers();
-	RenderWolfs();
+	RenderEnemies();
 }
 
 

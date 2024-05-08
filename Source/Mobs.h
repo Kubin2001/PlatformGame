@@ -20,19 +20,23 @@ class Enemy {
 		bool colision[4] = { 0,0,0,0 };
 
 	public:
-		SDL_Rect* GetRectangle();
+		SDL_Texture* texture;
 
-		int getAnimation();
+		virtual SDL_Rect* GetRectangle();
 
-		void setAnimation(int temp);
+		virtual int getAnimation();
 
-		int getHitPoints();
+		virtual void setAnimation(int temp);
 
-		void setHitPoints(int temp);
+		virtual int getHitPoints();
 
-		void setColison(bool value, int index);
+		virtual void setHitPoints(int temp);
 
-		bool getColison(int index);
+		virtual void setColison(bool value, int index);
+
+		virtual bool getColison(int index);
+
+		virtual void Movement(Player* player, Map* map) = 0;
 
 };
 
@@ -45,7 +49,7 @@ class Wolf : public Enemy{
 		Wolf() {
 			hitPoints = 20;
 		}
-		void Movement(Player* player, Map* map);
+		void Movement(Player* player, Map* map)override;
 };
 
 class Charger : public Enemy{
@@ -53,7 +57,7 @@ class Charger : public Enemy{
 		Charger() {
 			hitPoints = 10;
 		}
-		void Movement();
+		void Movement(Player* player, Map* map)override;
 };
 
 
@@ -61,13 +65,11 @@ class Mobs {
 	private:
 		SDL_Renderer* renderer;
 
-		std::vector<Charger> Chargers;
-
-		std::vector<Wolf> Wolfs;
+		std::vector<Enemy*> Enemies;
 
 		SDL_Texture *textureCharger = nullptr;
 
-		SDL_Texture* textureWolf = nullptr;
+		SDL_Texture *textureWolf = nullptr;
 
 	public:
 		Mobs(SDL_Renderer* renderer);
@@ -81,9 +83,8 @@ class Mobs {
 
 		void SetTextureWolf(SDL_Texture* temptex);
 
-		std::vector<Charger>& getChargers();
+		std::vector<Enemy*>& getEnemies();
 
-		std::vector<Wolf>& getWolfs();
 		//getters and setters
 
 		void LoadMobs();
@@ -92,9 +93,7 @@ class Mobs {
 
 		void MoveMobs(const Uint8* state, Player* player, Map *map);
 
-		void RenderChargers();
-
-		void RenderWolfs();
+		void RenderEnemies();
 
 		void Render();
 

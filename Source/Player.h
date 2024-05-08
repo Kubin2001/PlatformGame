@@ -29,7 +29,7 @@ class Player {
 	private:
 		SDL_Renderer* renderer = nullptr;
 		SDL_Texture* texture = nullptr;
-		SDL_Rect rectangle{ 700,400,50,100 };
+		SDL_Rect rectangle{ 700,400,32,70 };
 		Weapon* weapon = nullptr;
 		int JumpBuffer = 0;
 		bool colision[4] = { 0,0,0,0 };
