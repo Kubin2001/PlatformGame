@@ -32,6 +32,15 @@ void Weapon::SetAnimation(int temp) {
 	animation = temp;
 }
 
+int AttackParticle::GetAnimation() {
+	return animation;
+}
+void AttackParticle::SetAnimation(int temp) {
+	animation = temp;
+}
+
+SDL_Rect* AttackParticle::GetRectangle() { return &rectangle; }
+
 Player::Player(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 }
@@ -41,6 +50,12 @@ SDL_Texture* Player::GetTexture() {
 }
 
 void Player::SetTexture(SDL_Texture* temptex) {texture = temptex;}
+
+SDL_Texture* Player::GetTextureAttackParticle() {
+	return textureAttackParticle;
+}
+
+void Player::SetTextureAttackParticle(SDL_Texture* temptex) { textureAttackParticle = temptex; }
 
 SDL_Rect* Player::GetRectangle() {return &rectangle;}
 
@@ -106,7 +121,15 @@ void Player::Render() {
 					SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, weapon->GetRectangle(), 30.0, NULL, SDL_FLIP_NONE);
 					break;
 			}
-			
+			if (attackBuffer > 0) {
+				if (weapon->attackParticle.direction == 1) {
+					SDL_RenderCopy(renderer, textureAttackParticle, NULL, weapon->attackParticle.GetRectangle());
+				}
+				else
+				{
+					SDL_RenderCopyEx(renderer, textureAttackParticle, NULL, weapon->attackParticle.GetRectangle(), 0.0, NULL, flip);
+				}
+			}
 			break;
 		case 2:
 			switch (weapon->GetAnimation())
@@ -117,6 +140,15 @@ void Player::Render() {
 			case 2:
 				SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, weapon->GetRectangle(), -30.0, NULL, flip);
 				break;
+			}
+			if (attackBuffer > 0) {
+				if (weapon->attackParticle.direction == 1) {
+					SDL_RenderCopy(renderer, textureAttackParticle, NULL, weapon->attackParticle.GetRectangle());
+				}
+				else
+				{
+					SDL_RenderCopyEx(renderer, textureAttackParticle, NULL, weapon->attackParticle.GetRectangle(), 0.0, NULL, flip);
+				}
 			}
 			break;
 		}
@@ -132,9 +164,8 @@ void Player::Jump(const Uint8* state) {
 	else
 	{
 		JumpBuffer--;
-
 	}
-	
+
 	if (JumpBuffer < 0) {
 		JumpBuffer = 0;
 	}
@@ -192,16 +223,18 @@ void Player::Attack(const Uint8* state, Mobs* mobs) {
 			if (state[SDL_SCANCODE_SPACE]) {
 				attackBuffer = 60;
 				weapon->SetAnimation(2);
-				for (int i = 0; i < mobs->getEnemies().size(); i++)
-				{
-					if (SimpleCollision(*GetRectangle(), *mobs->getEnemies()[i]->GetRectangle()) == 1) {
-						std::cout << "XD";
-						mobs->getEnemies()[i]->setHitPoints(mobs->getEnemies()[i]->getHitPoints() - 10);
-						if (mobs->getEnemies()[i]->getHitPoints() < 1) {
-							mobs->getEnemies().erase(mobs->getEnemies().begin() + i);
-						}
-					}
+				weapon->attackParticle.GetRectangle()->x = weapon->GetRectangle()->x;
+				weapon->attackParticle.GetRectangle()->y = GetRectangle()->y;
+				weapon->attackParticle.GetRectangle()->w = 30;
+				weapon->attackParticle.GetRectangle()->h = 80;
+				if (animation == 1) {
+					weapon->attackParticle.direction = 1;
 				}
+				else
+				{
+					weapon->attackParticle.direction = 2;
+				}
+
 			}
 		}
 		else
@@ -209,6 +242,37 @@ void Player::Attack(const Uint8* state, Mobs* mobs) {
 			attackBuffer--;
 			if (attackBuffer < 30) {
 				weapon->SetAnimation(1);
+			}
+			for (int i = 0; i < mobs->getEnemies().size(); i++)
+			{
+				if (mobs->getEnemies()[i]->getInvTime() < 1) {
+					if (SimpleCollision(*weapon->attackParticle.GetRectangle(), *mobs->getEnemies()[i]->GetRectangle()) == 1) {
+						mobs->getEnemies()[i]->setHitPoints(mobs->getEnemies()[i]->getHitPoints() - 10);
+						mobs->getEnemies()[i]->setInvTime(20);
+						if (mobs->getEnemies()[i]->getHitPoints() < 1) {
+							mobs->getEnemies().erase(mobs->getEnemies().begin() + i);
+						}
+					}
+				}
+				
+			}
+			if (weapon->attackParticle.direction == 1) {
+				weapon->attackParticle.GetRectangle()->x += 8;
+			}
+			else
+			{
+				weapon->attackParticle.GetRectangle()->x -= 8;
+			}
+			if (attackBuffer == 0) {
+				weapon->attackParticle.GetRectangle()->w = -2;
+				weapon->attackParticle.GetRectangle()->h = -2;
+			}
+
+			if (!getColison(1) && JumpBuffer < 20) {//Góra
+				weapon->attackParticle.GetRectangle()->y -=5;
+			}
+			else if (!getColison(3) && JumpBuffer > 25) {//Dó³
+				weapon->attackParticle.GetRectangle()->y += 5;
 			}
 		}
 	}

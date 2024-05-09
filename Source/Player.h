@@ -5,6 +5,18 @@
 
 class Mobs;
 
+class AttackParticle {
+private:
+	SDL_Rect rectangle;
+	int animation = 1;
+public:
+	int direction = 1;
+	SDL_Rect* GetRectangle();
+	int GetAnimation();
+	void SetAnimation(int temp);
+
+};
+
 
 class Weapon {
 	private:
@@ -14,6 +26,7 @@ class Weapon {
 		SDL_Texture* texture = nullptr;
 
 	public:
+		AttackParticle attackParticle;
 		Weapon(int w, int h, int tempdamage, SDL_Texture *temptext);
 		SDL_Rect* GetRectangle();
 		SDL_Texture * GetTexture();
@@ -29,6 +42,7 @@ class Player {
 	private:
 		SDL_Renderer* renderer = nullptr;
 		SDL_Texture* texture = nullptr;
+		SDL_Texture* textureAttackParticle = nullptr;
 		SDL_Rect rectangle{ 700,400,32,70 };
 		Weapon* weapon = nullptr;
 		int JumpBuffer = 0;
@@ -68,6 +82,10 @@ class Player {
 		void SetTexture(SDL_Texture* temptex);
 
 		SDL_Rect* GetRectangle();
+
+		SDL_Texture* GetTextureAttackParticle();
+
+		void SetTextureAttackParticle(SDL_Texture* temptex);
 		//Getters and setters
 
 		void Render();

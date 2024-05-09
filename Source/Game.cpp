@@ -73,6 +73,7 @@ void Game::LoadTextures() {
         break;
     case 2:
         player->SetTexture(load("Textures/player.png", renderer));
+        player->SetTextureAttackParticle(load("Textures/Particles/wave.png", renderer));
         map->SetTextureFloor(load("Textures/Terrain/grass.png", renderer));
         map->SetTexturePlatform(load("Textures/Terrain/platform.png", renderer));
         map->SetTexturePilar(load("Textures/Terrain/pillar.png", renderer));

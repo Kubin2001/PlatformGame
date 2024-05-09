@@ -18,6 +18,7 @@ class Enemy {
 		int animation = 2;
 		int hitPoints = 20;
 		bool colision[4] = { 0,0,0,0 };
+		int invTime = 0;
 
 	public:
 		SDL_Texture* texture;
@@ -37,6 +38,10 @@ class Enemy {
 		virtual bool getColison(int index);
 
 		virtual void Movement(Player* player, Map* map) = 0;
+
+		virtual void setInvTime(int value);
+
+		virtual int getInvTime();
 
 };
 

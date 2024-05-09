@@ -48,6 +48,14 @@ bool Enemy::getColison(int index) {
 
 }
 
+void Enemy::setInvTime(int value) {
+	invTime = value;
+}
+
+int Enemy::getInvTime() {
+	return invTime;
+}
+
 void Wolf::Movement(Player* player, Map* map) {
 	if (cProj == nullptr) {
 		switch (animation)
@@ -124,6 +132,8 @@ void Wolf::Movement(Player* player, Map* map) {
 		break;
 	}
 }
+
+
 
 void Charger::Movement(Player* player, Map* map) {
 	if (colision[0]) {
@@ -309,6 +319,14 @@ void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map) {
 	for (int i = 0; i < Enemies.size(); i++)
 	{
 		Enemies[i]->Movement(player,map);
+	}
+
+	for (int i = 0; i < Enemies.size(); i++)
+	{
+		if (Enemies[i]->getInvTime() > 0) {
+			Enemies[i]->setInvTime(Enemies[i]->getInvTime() - 1);
+		}
+		//std::cout << Enemies[0]->getInvTime() << "\n";
 	}
 
 }
