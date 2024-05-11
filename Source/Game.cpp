@@ -17,6 +17,7 @@ Game::Game() {
     ui = nullptr;
     equipment = nullptr;
     levelEditor = nullptr;
+    particlesManager = nullptr;
 }
 
 void Game::SetUpWindow() {
@@ -24,11 +25,6 @@ void Game::SetUpWindow() {
     window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1400, 800, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    rectback.x = 0;
-    rectback.y = 0;
-    rectback.w = 1400;
-    rectback.h = 800;
 }
 
 void Game::Start() {
@@ -48,6 +44,7 @@ void Game::Start() {
             mobs = new Mobs(renderer);
             player = new Player(renderer);
             equipment = new Equipment(renderer);
+            particlesManager = new ParticlesManager(renderer);
             LoadTextures();
             map->CreateLevel();
             mobs->LoadMobs();
@@ -73,7 +70,7 @@ void Game::LoadTextures() {
         break;
     case 2:
         player->SetTexture(load("Textures/player.png", renderer));
-        player->SetTextureAttackParticle(load("Textures/Particles/wave.png", renderer));
+        particlesManager->SetTexture(load("Textures/Particles/wave.png", renderer));
         map->SetTextureFloor(load("Textures/Terrain/grass.png", renderer));
         map->SetTexturePlatform(load("Textures/Terrain/platform.png", renderer));
         map->SetTexturePilar(load("Textures/Terrain/pillar.png", renderer));
@@ -81,6 +78,7 @@ void Game::LoadTextures() {
         map->SetTextureFlag(load("Textures/Terrain/flag.png", renderer));
         mobs->SetTextureCharger(load("Textures/Mobs/charger.png", renderer));
         mobs->SetTextureWolf(load("Textures/Mobs/wolf.png", renderer));
+        mobs->SetTexturePirate(load("Textures/Mobs/pirate.png", renderer));
         ui->SetTextureHearth(load("Textures/Interface/hearth.png", renderer));
         ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
         equipment->SetTextureShortSword(load("Textures/Equipment/shortSword.png", renderer));
@@ -126,6 +124,8 @@ void Game::Events() {
             player->CheckDamage(ui);
             map->DetectColison(player,ui);
             mobs->DetectColison(player, map);
+            particlesManager->CheckColision(mobs,player);
+            particlesManager->EndLifeTime();
             equipment->DetectCollison(player);
             player->UpdateWeapon();
             break;
@@ -158,10 +158,11 @@ void Game::Movement() {
         break;
     case 2:
         player->Jump(state);
-        player->Attack(state,mobs);
+        player->Attack(state,particlesManager);
         map->MoveMap(state, player);
-        mobs->MoveMobs(state, player,map);
+        mobs->MoveMobs(state, player,map,particlesManager);
         equipment->MoveEquipment(state, player);
+        particlesManager->MoveParticles(state,player);
         break;
     case 3:
 
@@ -172,21 +173,20 @@ void Game::Movement() {
 
 void Game::Render() {
     SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, textback, NULL, &rectback);
     switch (windowtype) {
     case 1:
-        SDL_RenderCopy(renderer, textback, NULL, &rectback);
         ui->Render();
         break;
     case 2:
-        SDL_RenderCopy(renderer, textback, NULL, &rectback);
         player->Render();
         map->Render();
         mobs->Render();
         ui->Render();
         equipment->Render();
+        particlesManager->Render();
         break;
     case 3:
-        SDL_RenderCopy(renderer, textback, NULL, &rectback);
         levelEditor->Render();
         break;
     }
@@ -199,10 +199,12 @@ void Game::Clear() {
         delete ui;
         break;
     case 2:
+        delete ui;
         delete player;
         delete map;
         delete mobs;
         delete equipment;
+        delete particlesManager;
         break;
     case 3:
         delete levelEditor;

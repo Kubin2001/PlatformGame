@@ -56,7 +56,7 @@ int Enemy::getInvTime() {
 	return invTime;
 }
 
-void Wolf::Movement(Player* player, Map* map) {
+void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
 	if (cProj == nullptr) {
 		switch (animation)
 		{
@@ -134,8 +134,7 @@ void Wolf::Movement(Player* player, Map* map) {
 }
 
 
-
-void Charger::Movement(Player* player, Map* map) {
+void Charger::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
 	if (colision[0]) {
 		movementtype = 2;
 		animation = 1;
@@ -163,6 +162,106 @@ void Charger::Movement(Player* player, Map* map) {
 	}
 	
 }
+
+
+void Pirate::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
+	if (isAggressive == false) {
+		if (cProj == nullptr) {
+			switch (animation)
+			{
+			case 1:
+				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y+10, 1, 1, 30, 0);
+				break;
+			case 2:
+				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y+10, 1, 1, -30, 0);
+				break;
+			}
+		}
+		else
+		{
+			cProj->MoveProjectlile();
+			for (int i = 0; i < map->getMapObjects().size(); i++)
+			{
+				if (SimpleCollision(*cProj->GetRectangle(), *map->getMapObjects()[i].GetRectangle()) == 1)
+				{
+					cProj->SetTimer(50);
+					break;
+				}
+			}
+
+
+			if (SimpleCollision(*cProj->GetRectangle(), *player->GetRectangle()) == 1) {
+				cProj->SetTimer(50);
+				isAggressive = true;
+				agroo = 500;
+			}
+
+			if (cProj->GetTimer() > 50) {
+				delete cProj;
+				cProj = nullptr;
+			}
+		}
+
+		if (colision[0]) {
+			movementtype = 2;
+			animation = 1;
+		}
+		else if (colision[2])
+		{
+			movementtype = 1;
+			animation = 2;
+		}
+		else if (colision[0] && colision[2]) {
+			movementtype = 0;
+		}
+
+		switch (movementtype)
+		{
+		case 1:
+			GetRectangle()->x--;
+			break;
+
+		case 2:
+			GetRectangle()->x++;
+		}
+	}
+	else
+	{
+		agroo--;
+		if (!colision[2] && player->GetRectangle()->x > GetRectangle()->x) {
+			animation = 1;
+			GetRectangle()->x+=2;
+		}
+		else if (!colision[0] && player->GetRectangle()->x < GetRectangle()->x) {
+			animation = 2;
+			GetRectangle()->x-=2;
+		}
+
+		if (AttackDelay < 0) {
+			AttackDelay = 100;
+			SDL_Rect rect{ GetRectangle()->x ,GetRectangle()->y ,30,80 };
+			switch (animation)
+			{
+				case 1:
+					particleManager->CreateEnemyAttackParticles(rect, 1, 6, 35);
+					break;
+				case 2:
+					particleManager->CreateEnemyAttackParticles(rect, 2, -6, 35);
+					break;
+			}
+		}
+		else
+		{
+			AttackDelay--;
+		}
+		if (agroo < 0) {
+			isAggressive = false;
+		}
+	}
+
+
+	
+}
 //getters and setters
 SDL_Texture* Mobs::GetTextureCharger() {
     return textureCharger;
@@ -178,6 +277,14 @@ SDL_Texture* Mobs::GetTextureWolf() {
 
 void Mobs::SetTextureWolf(SDL_Texture* temptex) {
 	textureWolf = temptex;
+}
+
+SDL_Texture* Mobs::GetTexturePirate() {
+	return texturePirate;
+}
+
+void Mobs::SetTexturePirate(SDL_Texture* temptex) {
+	texturePirate = temptex;
 }
 
 std::vector<Enemy*>& Mobs::getEnemies() { return Enemies; }
@@ -203,7 +310,7 @@ void Mobs::LoadMobs() {
 				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
 				Enemies[Enemies.size() - 1]->texture = textureCharger;
 			}
-			if (line == "wolf") {
+			else if (line == "wolf") {
 				Enemies.push_back(new Wolf());
 				getline(levelFile, line);
 				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
@@ -214,6 +321,20 @@ void Mobs::LoadMobs() {
 				getline(levelFile, line);
 				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
 				Enemies[Enemies.size() - 1]->texture = textureWolf;
+
+			}
+
+			else if (line == "pirate") {
+				Enemies.push_back(new Pirate());
+				getline(levelFile, line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
+				getline(levelFile, line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->y = std::stoi(line);
+				getline(levelFile, line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
+				getline(levelFile, line);
+				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
+				Enemies[Enemies.size() - 1]->texture = texturePirate;
 
 			}
 		}
@@ -290,7 +411,7 @@ void Mobs::DetectColison(Player* player,Map *map) {
 	}
 }
 
-void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map) {
+void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map, ParticlesManager* particleManager) {
 	if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
 		for (int i = 0; i < Enemies.size(); i++)
 		{
@@ -318,7 +439,7 @@ void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map) {
 	}
 	for (int i = 0; i < Enemies.size(); i++)
 	{
-		Enemies[i]->Movement(player,map);
+		Enemies[i]->Movement(player,map,particleManager);
 	}
 
 	for (int i = 0; i < Enemies.size(); i++)

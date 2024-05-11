@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <vector>
 #include "Font.h"
+
 class ButtonInfo {
     private:
         SDL_Rect rectangle;

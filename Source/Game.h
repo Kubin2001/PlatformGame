@@ -6,6 +6,7 @@
 #include "UI.h"
 #include "Equipment.h"
 #include "LevelEditor.h"
+#include "ParticlesManager.h"
 
 class Game {
 private:
@@ -16,10 +17,12 @@ private:
 	Mobs* mobs;
 	UI* ui;
 	Equipment* equipment;
+	ParticlesManager* particlesManager;
 	LevelEditor* levelEditor;
 	
 	SDL_Texture* textback;
-	SDL_Rect rectback;
+	bool renderBack = true;
+	SDL_Rect rectback{0,0,1400,800};
 	SDL_Event event;
 
 public:

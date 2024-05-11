@@ -5,7 +5,9 @@
 #include <cstdlib>
 #include "player.h"
 #include "Map.h"
+#include "UI.h"
 #include "Colision.h"
+#include "ParticlesManager.h"
 
 class Player;
 
@@ -37,7 +39,7 @@ class Enemy {
 
 		virtual bool getColison(int index);
 
-		virtual void Movement(Player* player, Map* map) = 0;
+		virtual void Movement(Player* player, Map* map, ParticlesManager* particleManager) = 0;
 
 		virtual void setInvTime(int value);
 
@@ -54,7 +56,13 @@ class Wolf : public Enemy{
 		Wolf() {
 			hitPoints = 20;
 		}
-		void Movement(Player* player, Map* map)override;
+
+		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		~Wolf() {
+			delete cProj;
+			cProj = nullptr;
+		}
 };
 
 class Charger : public Enemy{
@@ -62,7 +70,28 @@ class Charger : public Enemy{
 		Charger() {
 			hitPoints = 10;
 		}
-		void Movement(Player* player, Map* map)override;
+
+		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+};
+
+class Pirate : public Enemy {
+	private:
+		CollisonProjectile* cProj;
+		bool isAggressive = false;
+		int AttackDelay = 0;
+		int agroo = 0;
+
+	public:
+		Pirate() {
+			hitPoints = 40;
+		}
+
+		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		~Pirate() {
+			delete cProj;
+			cProj = nullptr;
+		}
 };
 
 
@@ -76,6 +105,8 @@ class Mobs {
 
 		SDL_Texture *textureWolf = nullptr;
 
+		SDL_Texture *texturePirate = nullptr;
+
 	public:
 		Mobs(SDL_Renderer* renderer);
 
@@ -88,6 +119,10 @@ class Mobs {
 
 		void SetTextureWolf(SDL_Texture* temptex);
 
+		SDL_Texture* GetTexturePirate();
+
+		void SetTexturePirate(SDL_Texture* temptex);
+
 		std::vector<Enemy*>& getEnemies();
 
 		//getters and setters
@@ -96,7 +131,7 @@ class Mobs {
 
 		void DetectColison(Player* player,Map* map);
 
-		void MoveMobs(const Uint8* state, Player* player, Map *map);
+		void MoveMobs(const Uint8* state, Player* player, Map *map, ParticlesManager* particleManager);
 
 		void RenderEnemies();
 

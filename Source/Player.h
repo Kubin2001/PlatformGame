@@ -2,21 +2,10 @@
 #include <SDL.h>
 #include "UI.h"
 #include "Mobs.h"
+#include "ParticlesManager.h"
 
 class Mobs;
-
-class AttackParticle {
-private:
-	SDL_Rect rectangle;
-	int animation = 1;
-public:
-	int direction = 1;
-	SDL_Rect* GetRectangle();
-	int GetAnimation();
-	void SetAnimation(int temp);
-
-};
-
+class ParticlesManager;
 
 class Weapon {
 	private:
@@ -26,7 +15,6 @@ class Weapon {
 		SDL_Texture* texture = nullptr;
 
 	public:
-		AttackParticle attackParticle;
 		Weapon(int w, int h, int tempdamage, SDL_Texture *temptext);
 		SDL_Rect* GetRectangle();
 		SDL_Texture * GetTexture();
@@ -42,7 +30,6 @@ class Player {
 	private:
 		SDL_Renderer* renderer = nullptr;
 		SDL_Texture* texture = nullptr;
-		SDL_Texture* textureAttackParticle = nullptr;
 		SDL_Rect rectangle{ 700,400,32,70 };
 		Weapon* weapon = nullptr;
 		int JumpBuffer = 0;
@@ -73,6 +60,10 @@ class Player {
 
 		void setattackBuffer(int value);
 
+		int getDamageBuffer();
+
+		void setDamageBuffer(int value);
+
 		int getattackBuffer();
 
 		bool GetDamage();
@@ -98,7 +89,7 @@ class Player {
 
 		void UpdateWeapon();
 
-		void Attack(const Uint8* state, Mobs *mobs);
+		void Attack(const Uint8* state, ParticlesManager* particleManager);
 
 		~Player();
 };
