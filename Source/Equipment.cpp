@@ -49,33 +49,20 @@ void Equipment::LoadEquipment() {
 }
 
 void Equipment::MoveEquipment(const Uint8* state, Player* player) {
-	if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-		for (int i = 0; i < ShortSwords.size(); i++)
-		{
-			ShortSwords[i].GetRectangle()->x -= 4;
-		}
-	}
-	if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-		for (int i = 0; i < ShortSwords.size(); i++)
-		{
-			ShortSwords[i].GetRectangle()->x += 4;
-		}
-	}
-	if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-		for (int i = 0; i < ShortSwords.size(); i++)
-		{
-			ShortSwords[i].GetRectangle()->y -= 5;
-		}
-	}
-	if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-		for (int i = 0; i < ShortSwords.size(); i++)
-		{
-			ShortSwords[i].GetRectangle()->y += 5;
-		}
-	}
+	
 }
 
-void Equipment::DetectCollison(Player* player) {
+void Equipment::DetectCollison(Player* player,SDL_Rect camRect) {
+	for (int i = 0; i < ShortSwords.size(); i++)
+	{
+		if (SimpleCollision(camRect, *ShortSwords[i].GetRectangle())) {
+			ShortSwords[i].SetRenderable(true);
+		}
+		else
+		{
+			ShortSwords[i].SetRenderable(false);
+		}
+	}
 	for (int i = 0; i < ShortSwords.size(); i++)
 	{
 		switch (SimpleCollision(*player->GetRectangle(), *ShortSwords[i].GetRectangle()))
@@ -90,14 +77,22 @@ void Equipment::DetectCollison(Player* player) {
 	}
 }
 
-void Equipment::Render() {
-	RenderShortSword();
+void Equipment::Render(SDL_Rect camRect) {
+	RenderShortSword(camRect);
 }
 
-void Equipment::RenderShortSword() {
+void Equipment::RenderShortSword(SDL_Rect camRect) {
+	SDL_Rect temp;
 	for (int i = 0; i < ShortSwords.size(); i++)
 	{
-		SDL_RenderCopy(renderer, textureShortSword, NULL, ShortSwords[i].GetRectangle());
+		if (ShortSwords[i].GetRenderable()) {
+			temp.x = ShortSwords[i].GetRectangle()->x - camRect.x;
+			temp.y = ShortSwords[i].GetRectangle()->y - camRect.y;
+			temp.w = ShortSwords[i].GetRectangle()->w;
+			temp.h = ShortSwords[i].GetRectangle()->h;
+
+			SDL_RenderCopy(renderer, textureShortSword, NULL, &temp);
+		}
 	}
 	
 }
@@ -106,6 +101,10 @@ void Equipment::RenderShortSword() {
 SDL_Rect* ShortSword::GetRectangle() {
     return &rectangle;
 }
+
+bool ShortSword::GetRenderable() { return renderable; }
+
+void ShortSword::SetRenderable(bool temp) { renderable = temp; }
 
 Equipment::~Equipment() {
 	SDL_DestroyTexture(textureShortSword);

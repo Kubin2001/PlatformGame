@@ -15,6 +15,7 @@ class Particle {
         int direction = 1;
         int speed = 0;
         int lifeTime = 0;
+        bool renderable = false;
     public:
         SDL_Rect* GetRectangle();
         int GetDirection();
@@ -23,6 +24,10 @@ class Particle {
         void SetSpeed(int temp);
         int GetLifeTime();
         void SetLifeTime(int temp);
+
+        bool GetRenderable();
+
+        void SetRenderable(bool temp);
 
 };
 
@@ -62,17 +67,17 @@ class ParticlesManager
 
         void SetTexture(SDL_Texture* temptex);
 
-        void Render();
+        void Render(SDL_Rect camRect);
 
         void CreatePlayerAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime);
 
         void CreateEnemyAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime);
 
-        void CheckColision(Mobs* mobs,Player* player);
+        void CheckColision(Mobs* mobs,Player* player, SDL_Rect camRect);
 
-        void CheckColisionMobs(Mobs * mobs);
+        void CheckColisionMobs(Mobs * mobs, SDL_Rect camRect);
 
-        void CheckColisionPlayer(Player* player);
+        void CheckColisionPlayer(Player* player, SDL_Rect camRect);
 
         void EndLifeTime();
 

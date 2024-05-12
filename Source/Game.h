@@ -7,11 +7,14 @@
 #include "Equipment.h"
 #include "LevelEditor.h"
 #include "ParticlesManager.h"
+#include "Camera.h"
 
 class Game {
 private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+
+	Camera* camera;
 	Player* player;
 	Map* map;
 	Mobs* mobs;

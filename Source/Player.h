@@ -3,6 +3,7 @@
 #include "UI.h"
 #include "Mobs.h"
 #include "ParticlesManager.h"
+#include "Camera.h"
 
 class Mobs;
 class ParticlesManager;
@@ -79,7 +80,9 @@ class Player {
 		void SetTextureAttackParticle(SDL_Texture* temptex);
 		//Getters and setters
 
-		void Render();
+		void Render(SDL_Rect camRect);
+
+		void Move(const Uint8* state);
 
 		void Jump(const Uint8* state);
 

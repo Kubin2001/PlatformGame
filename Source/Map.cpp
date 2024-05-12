@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Colision.h"
 #include "UI.h"
+#include "Camera.h"
 
 extern int windowtype;
 extern int localWindow;
@@ -34,106 +35,7 @@ void Map::SetTextureFlag(SDL_Texture* temptex) {textureFlag = temptex;}
 
 //getters and setters
 
-void Map::DetectColison(Player* player,UI *ui) {
-	for (int i = 0; i < MapObjects.size(); i++)
-	{
-		switch (Collision(*player->GetRectangle(), *MapObjects[i].GetRectangle()))
-		{
-		case 1:
-			player->setColison(true, 0);
-			break;
-		case 2:
-			player->setColison(true, 1);
-			break;
-		case 3:
-			player->setColison(true, 2);
-			break;
-		case 4:
-			player->setColison(true, 3);
-			player->setJumpBuffer(20);
-			break;
-		}
-	}
-
-	for (int i = 0; i < Flags.size(); i++)
-	{
-		switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
-		{
-		case 3:
-			ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
-			SDL_Delay(4000);
-			localWindow = 1;
-			break;
-		}
-	}
-}
-
-void Map::MoveMap(const Uint8* state,Player *player) {
-	if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-		for (int i = 0; i < MapObjects.size(); i++)
-		{
-			MapObjects[i].GetRectangle()->x-=4;
-		}
-		for (int i = 0; i < Flags.size(); i++)
-		{
-			Flags[i].GetRectangle()->x -= 4;
-		}
-		for (int i = 0; i < InvWalls.size(); i++)
-		{
-			InvWalls[i].GetRectangle()->x -= 4;
-		}
-		player->setanimation(1);
-	}
-	
-
-	if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-		for (int i = 0; i < MapObjects.size(); i++)
-		{
-			MapObjects[i].GetRectangle()->x += 4;
-		}
-		for (int i = 0; i < Flags.size(); i++)
-		{
-			Flags[i].GetRectangle()->x += 4;
-		}
-		for (int i = 0; i < InvWalls.size(); i++)
-		{
-			InvWalls[i].GetRectangle()->x += 4;
-		}
-		player->setanimation(2);
-	}
-
-	if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-		for (int i = 0; i < MapObjects.size(); i++)
-		{
-			MapObjects[i].GetRectangle()->y -= 5;
-		}
-		for (int i = 0; i < Flags.size(); i++)
-		{
-			Flags[i].GetRectangle()->y -= 5;
-		}
-		for (int i = 0; i < InvWalls.size(); i++)
-		{
-			InvWalls[i].GetRectangle()->y -= 5;
-		}
-	}
-	if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-		for (int i = 0; i < MapObjects.size(); i++)
-		{
-			MapObjects[i].GetRectangle()->y += 5;
-		}
-
-		for (int i = 0; i < Flags.size(); i++)
-		{
-			Flags[i].GetRectangle()->y += 5;
-		}
-		for (int i = 0; i < InvWalls.size(); i++)
-		{
-			InvWalls[i].GetRectangle()->y += 5;
-		}
-	}
-}
-
-void Map::CreateLevel(){
+void Map::CreateLevel() {
 	MapObject mapObject;
 	Flag flag;
 	InvWall invWall;
@@ -192,49 +94,112 @@ void Map::CreateLevel(){
 	}
 }
 
-void Map::RenderObjects() {
+void Map::DetectColison(Player* player,UI *ui,Camera *camera) {
 	for (int i = 0; i < MapObjects.size(); i++)
 	{
-		SDL_RenderCopy(renderer, MapObjects[i].GetTexture(), NULL, MapObjects[i].GetRectangle());
+		if (SimpleCollision(*camera->GetRectangle(), *MapObjects[i].GetRectangle())) {
+			MapObjects[i].SetRenderable(true);
+		}
+		else
+		{
+			MapObjects[i].SetRenderable(false);
+		}
 	}
-}
-
-void Map::RenderFlag() {
 	for (int i = 0; i < Flags.size(); i++)
 	{
-		SDL_RenderCopy(renderer, textureFlag, NULL, Flags[i].GetRectangle());
+		if (SimpleCollision(*camera->GetRectangle(), *Flags[i].GetRectangle())) {
+			Flags[i].SetRenderable(true);
+		}
+		else
+		{
+			Flags[i].SetRenderable(false);
+		}
+	}
+
+	for (int i = 0; i < MapObjects.size(); i++)
+	{
+		switch (Collision(*player->GetRectangle(), *MapObjects[i].GetRectangle()))
+		{
+		case 1:
+			player->setColison(true, 0);
+			break;
+		case 2:
+			player->setColison(true, 1);
+			break;
+		case 3:
+			player->setColison(true, 2);
+			break;
+		case 4:
+			player->setColison(true, 3);
+			break;
+		}
+	}
+
+	for (int i = 0; i < Flags.size(); i++)
+	{
+		switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
+		{
+		case 3:
+			ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
+			SDL_Delay(4000);
+			localWindow = 1;
+			break;
+		}
 	}
 }
 
-void Map::Render() {
-	RenderObjects();
-	RenderFlag();
+void Map::MoveMap(const Uint8* state,Player *player) {
+
+}
+
+
+void Map::RenderObjects(SDL_Rect camRect) {
+	SDL_Rect temp;
+	for (int i = 0; i < MapObjects.size(); i++)
+	{
+		if (MapObjects[i].GetRenderable()) {
+			temp.x = MapObjects[i].GetRectangle()->x - camRect.x;
+			temp.y = MapObjects[i].GetRectangle()->y - camRect.y;
+			temp.w = MapObjects[i].GetRectangle()->w;
+			temp.h = MapObjects[i].GetRectangle()->h;
+
+			SDL_RenderCopy(renderer, MapObjects[i].GetTexture(), NULL, &temp);
+		}
+	}
+}
+
+void Map::RenderFlag(SDL_Rect camRect) {
+	SDL_Rect temp;
+	for (int i = 0; i < Flags.size(); i++)
+	{
+		if (Flags[i].GetRenderable()) {
+			temp.x = Flags[i].GetRectangle()->x - camRect.x;
+			temp.y = Flags[i].GetRectangle()->y - camRect.y;
+			temp.w = Flags[i].GetRectangle()->w;
+			temp.h = Flags[i].GetRectangle()->h;
+
+			SDL_RenderCopy(renderer, textureFlag, NULL, &temp);
+		}
+	}
+}
+
+void Map::Render(SDL_Rect camRect) {
+	RenderObjects(camRect);
+	RenderFlag(camRect);
 	//for (int i = 0; i < InvWalls.size(); i++){
 	//	SDL_RenderCopy(renderer, textureInvWall, NULL, InvWalls[i].GetRectangle());
 	//}
 }
 
+SDL_Rect* Object::GetRectangle() { return &rectangle;}
 
-SDL_Rect* MapObject::GetRectangle() {
-	return &rectangle;
-}
+bool Object::GetRenderable() { return renderable;}
 
-
-
-SDL_Rect* Flag::GetRectangle() {
-	return &rectangle;
-}
-
-SDL_Rect* InvWall::GetRectangle() {
-	return &rectangle;
-}
-
+void Object::SetRenderable(bool temp) { renderable = temp;}
 
 std::vector<MapObject>& Map::getMapObjects() {
 	return MapObjects;
 }
-
-
 
 std::vector<Flag>& Map::getFlag() {
 	return Flags;

@@ -6,6 +6,8 @@
 bool status = true;
 int windowtype = 1;
 int localWindow = 1;
+int windowWidth = 1400;
+int windowHeight = 800;
 std::string levelName = "Levels/level1.txt";
 
 SDL_Texture* load(const char* file, SDL_Renderer* ren) {

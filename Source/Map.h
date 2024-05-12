@@ -4,17 +4,31 @@
 #include <vector>
 #include "Player.h"
 #include "UI.h"
+#include "Camera.h"
 
 class Player;
 
-
-class MapObject {
-	private:
+class Object {
+	protected:
 		SDL_Rect rectangle;
-		SDL_Texture* texture;
+		bool renderable = false;
 
 	public:
 		SDL_Rect* GetRectangle();
+
+		bool GetRenderable();
+
+		void SetRenderable(bool temp);
+
+};
+
+class MapObject : public Object {
+	private:
+		SDL_Rect rectangle;
+		SDL_Texture* texture;
+		bool renderable = false;
+
+	public:
 
 		SDL_Texture* GetTexture();
 
@@ -22,20 +36,19 @@ class MapObject {
 };
 
 
-class Flag {
+class Flag : public Object  {
 	private:
 		SDL_Rect rectangle;
+		bool renderable = false;
 
 	public:
-		SDL_Rect* GetRectangle();
 };
 
-class InvWall {
+class InvWall : public Object {
 	private:
 		SDL_Rect rectangle;
 
 	public:
-		SDL_Rect* GetRectangle();
 };
 
 
@@ -77,17 +90,17 @@ class Map {
 		SDL_Rect* GetRectangle(int index);
 		//getters and setters
 
-		void Render();
+		void Render(SDL_Rect camRect);
 
-		void DetectColison(Player* player,UI *ui);
+		void DetectColison(Player* player,UI *ui, Camera* camera);
 
 		void MoveMap(const Uint8* state,Player *player);
 
 		void CreateLevel();
 
-		void RenderObjects();
+		void RenderObjects(SDL_Rect camRect);
 
-		void RenderFlag();
+		void RenderFlag(SDL_Rect camRect);
 
 		std::vector<MapObject> &getMapObjects();
 

@@ -8,6 +8,7 @@
 #include "UI.h"
 #include "Colision.h"
 #include "ParticlesManager.h"
+#include "Camera.h"
 
 class Player;
 
@@ -21,6 +22,7 @@ class Enemy {
 		int hitPoints = 20;
 		bool colision[4] = { 0,0,0,0 };
 		int invTime = 0;
+		bool renderable = false;
 
 	public:
 		SDL_Texture* texture;
@@ -39,11 +41,16 @@ class Enemy {
 
 		virtual bool getColison(int index);
 
-		virtual void Movement(Player* player, Map* map, ParticlesManager* particleManager) = 0;
-
 		virtual void setInvTime(int value);
 
 		virtual int getInvTime();
+
+		virtual bool GetRenderable();
+
+		virtual void SetRenderable(bool temp);
+
+		virtual void Movement(Player* player, Map* map, ParticlesManager* particleManager) = 0;
+
 
 };
 
@@ -129,13 +136,13 @@ class Mobs {
 
 		void LoadMobs();
 
-		void DetectColison(Player* player,Map* map);
+		void DetectColison(Player* player,Map* map, SDL_Rect camRect);
 
 		void MoveMobs(const Uint8* state, Player* player, Map *map, ParticlesManager* particleManager);
 
-		void RenderEnemies();
+		void RenderEnemies(SDL_Rect camRect);
 
-		void Render();
+		void Render(SDL_Rect camRect);
 
 		~Mobs();
 };

@@ -40,32 +40,48 @@ int Particle::GetLifeTime() {
 void Particle::SetLifeTime(int temp) {
     lifeTime = temp;
 }
+
+bool Particle::GetRenderable() { return renderable; }
+
+void Particle::SetRenderable(bool temp) { renderable = temp; }
 //Getteers and setters
 
-void ParticlesManager::Render() {
+void ParticlesManager::Render(SDL_Rect camRect) {
+    SDL_Rect temp;
     SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
     for (int i = 0; i < PlayerAttackParticles.size(); i++) {
-        switch (PlayerAttackParticles[i].GetDirection()) {
+        if (PlayerAttackParticles[i].GetRenderable()) {
+            temp.x = PlayerAttackParticles[i].GetRectangle()->x - camRect.x;
+            temp.y = PlayerAttackParticles[i].GetRectangle()->y - camRect.y;
+            temp.w = PlayerAttackParticles[i].GetRectangle()->w;
+            temp.h = PlayerAttackParticles[i].GetRectangle()->h;
+            switch (PlayerAttackParticles[i].GetDirection()) {
             case 1:
-                SDL_RenderCopy(renderer, textureWayve, NULL, PlayerAttackParticles[i].GetRectangle());
+                SDL_RenderCopy(renderer, textureWayve, NULL, &temp);
                 break;
             case 2:
-                SDL_RenderCopyEx(renderer, textureWayve, NULL, PlayerAttackParticles[i].GetRectangle(), 0.0, NULL, flip);
+                SDL_RenderCopyEx(renderer, textureWayve, NULL, &temp, 0.0, NULL, flip);
                 break;
+            }
         }
     }
 
     for (int i = 0; i < EnemyAttackParticles.size(); i++) {
-        switch (EnemyAttackParticles[i].GetDirection()) {
-        case 1:
-            SDL_RenderCopy(renderer, textureWayve, NULL, EnemyAttackParticles[i].GetRectangle());
-            break;
-        case 2:
-            SDL_RenderCopyEx(renderer, textureWayve, NULL, EnemyAttackParticles[i].GetRectangle(), 0.0, NULL, flip);
-            break;
+        if (EnemyAttackParticles[i].GetRenderable()) {
+            temp.x = EnemyAttackParticles[i].GetRectangle()->x - camRect.x;
+            temp.y = EnemyAttackParticles[i].GetRectangle()->y - camRect.y;
+            temp.w = EnemyAttackParticles[i].GetRectangle()->w;
+            temp.h = EnemyAttackParticles[i].GetRectangle()->h;
+            switch (EnemyAttackParticles[i].GetDirection()) {
+            case 1:
+                SDL_RenderCopy(renderer, textureWayve, NULL, &temp);
+                break;
+            case 2:
+                SDL_RenderCopyEx(renderer, textureWayve, NULL, &temp, 0.0, NULL, flip);
+                break;
+            }
         }
     }
-
 }
 
 void ParticlesManager::CreatePlayerAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime) {
@@ -78,12 +94,22 @@ void ParticlesManager::CreateEnemyAttackParticles(SDL_Rect rect, int direction, 
     EnemyAttackParticles.push_back(temp);
 }
 
-void ParticlesManager::CheckColision(Mobs* mobs, Player* player) {
-    CheckColisionMobs(mobs);
-    CheckColisionPlayer(player);
+void ParticlesManager::CheckColision(Mobs* mobs, Player* player, SDL_Rect camRect) {
+    CheckColisionMobs(mobs, camRect);
+    CheckColisionPlayer(player, camRect);
 }
 
-void ParticlesManager::CheckColisionMobs(Mobs* mobs) {
+void ParticlesManager::CheckColisionMobs(Mobs* mobs,SDL_Rect camRect) {
+    for (int i = 0; i < PlayerAttackParticles.size(); i++)
+    {
+        if (SimpleCollision(camRect, *PlayerAttackParticles[i].GetRectangle())) {
+            PlayerAttackParticles[i].SetRenderable(true);
+        }
+        else
+        {
+            PlayerAttackParticles[i].SetRenderable(false);
+        }
+    }
     for (int i = 0; i < PlayerAttackParticles.size(); i++)
     {
         for (int j = 0; j < mobs->getEnemies().size(); j++)
@@ -101,7 +127,17 @@ void ParticlesManager::CheckColisionMobs(Mobs* mobs) {
     };
 }
 
-void ParticlesManager::CheckColisionPlayer(Player * player) {
+void ParticlesManager::CheckColisionPlayer(Player * player, SDL_Rect camRect) {
+    for (int i = 0; i < EnemyAttackParticles.size(); i++)
+    {
+        if (SimpleCollision(camRect, *EnemyAttackParticles[i].GetRectangle())) {
+            EnemyAttackParticles[i].SetRenderable(true);
+        }
+        else
+        {
+            EnemyAttackParticles[i].SetRenderable(false);
+        }
+    }
     for (int i = 0; i < EnemyAttackParticles.size(); i++)
     {
         if (SimpleCollision(*EnemyAttackParticles[i].GetRectangle(), *player->GetRectangle())) {
@@ -134,30 +170,6 @@ void ParticlesManager::MoveParticlesPlayer(const Uint8* state, Player* player) {
     if (PlayerAttackParticles.empty()) {
         return;
     }
-    if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-        for (int i = 0; i < PlayerAttackParticles.size(); i++)
-        {
-            PlayerAttackParticles[i].GetRectangle()->x -= 4;
-        }
-    }
-    if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-        for (int i = 0; i < PlayerAttackParticles.size(); i++)
-        {
-            PlayerAttackParticles[i].GetRectangle()->x += 4;
-        }
-    }
-    if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-        for (int i = 0; i < PlayerAttackParticles.size(); i++)
-        {
-            PlayerAttackParticles[i].GetRectangle()->y -= 5;
-        }
-    }
-    if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-        for (int i = 0; i < PlayerAttackParticles.size(); i++)
-        {
-            PlayerAttackParticles[i].GetRectangle()->y += 5;
-        }
-    }
     for (int i = 0; i < PlayerAttackParticles.size(); i++)
     {
         PlayerAttackParticles[i].GetRectangle()->x += PlayerAttackParticles[i].GetSpeed();
@@ -167,30 +179,6 @@ void ParticlesManager::MoveParticlesPlayer(const Uint8* state, Player* player) {
 void ParticlesManager::MoveParticlesEnemy(const Uint8* state, Player* player) {
     if (EnemyAttackParticles.empty()) {
         return;
-    }
-    if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-        for (int i = 0; i < EnemyAttackParticles.size(); i++)
-        {
-            EnemyAttackParticles[i].GetRectangle()->x -= 4;
-        }
-    }
-    if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-        for (int i = 0; i < EnemyAttackParticles.size(); i++)
-        {
-            EnemyAttackParticles[i].GetRectangle()->x += 4;
-        }
-    }
-    if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-        for (int i = 0; i < EnemyAttackParticles.size(); i++)
-        {
-            EnemyAttackParticles[i].GetRectangle()->y -= 5;
-        }
-    }
-    if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-        for (int i = 0; i < EnemyAttackParticles.size(); i++)
-        {
-            EnemyAttackParticles[i].GetRectangle()->y += 5;
-        }
     }
     for (int i = 0; i < EnemyAttackParticles.size(); i++)
     {

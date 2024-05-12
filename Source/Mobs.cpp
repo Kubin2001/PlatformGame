@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Colision.h"
 #include "Map.h"
+#include "Camera.h"
 
 extern std::string levelName;
 
@@ -55,6 +56,10 @@ void Enemy::setInvTime(int value) {
 int Enemy::getInvTime() {
 	return invTime;
 }
+
+bool Enemy::GetRenderable() { return renderable; }
+
+void Enemy::SetRenderable(bool temp) { renderable = temp; }
 
 void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
 	if (cProj == nullptr) {
@@ -345,7 +350,17 @@ void Mobs::LoadMobs() {
 	}
 }
 
-void Mobs::DetectColison(Player* player,Map *map) {
+void Mobs::DetectColison(Player* player,Map *map, SDL_Rect camRect) {
+	for (int i = 0; i < Enemies.size(); i++)
+	{
+		if (SimpleCollision(camRect, *Enemies[i]->GetRectangle())) {
+			Enemies[i]->SetRenderable(true);
+		}
+		else
+		{
+			Enemies[i]->SetRenderable(false);
+		}
+	}
 	for (int i = 0; i < Enemies.size(); i++)
 	{
 		Enemies[i]->setColison(false, 0);
@@ -396,7 +411,7 @@ void Mobs::DetectColison(Player* player,Map *map) {
 				break;
 			case 2:
 				player->setColison(true, 1);
-				player->setJumpBuffer(40);
+				player->setJumpBuffer(15);
 				Enemies[i]->setHitPoints(Enemies[i]->getHitPoints() - 10);
 				if (Enemies[i]->getHitPoints() < 1) {
 					delete Enemies[i];
@@ -412,31 +427,6 @@ void Mobs::DetectColison(Player* player,Map *map) {
 }
 
 void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map, ParticlesManager* particleManager) {
-	if (state[SDL_SCANCODE_RIGHT] && player->getColison(2) == false) {
-		for (int i = 0; i < Enemies.size(); i++)
-		{
-			Enemies[i]->GetRectangle()->x -= 4;
-		}
-	}
-	if (state[SDL_SCANCODE_LEFT] && player->getColison(0) == false) {
-		for (int i = 0; i < Enemies.size(); i++)
-		{
-			Enemies[i]->GetRectangle()->x += 4;
-		}
-	}
-
-	if (player->getColison(1) == 0 && player->getJumpBuffer() < 20) {//Góra
-		for (int i = 0; i < Enemies.size(); i++)
-		{
-			Enemies[i]->GetRectangle()->y -= 5;
-		}	
-	}
-	if (player->getColison(3) == 0 && player->getJumpBuffer() > 25) {//Dó³
-		for (int i = 0; i < Enemies.size(); i++)
-		{
-			Enemies[i]->GetRectangle()->y += 5;
-		}
-	}
 	for (int i = 0; i < Enemies.size(); i++)
 	{
 		Enemies[i]->Movement(player,map,particleManager);
@@ -447,31 +437,37 @@ void Mobs::MoveMobs(const Uint8* state, Player* player,Map *map, ParticlesManage
 		if (Enemies[i]->getInvTime() > 0) {
 			Enemies[i]->setInvTime(Enemies[i]->getInvTime() - 1);
 		}
-		//std::cout << Enemies[0]->getInvTime() << "\n";
 	}
 
 }
 
 
-void Mobs::RenderEnemies() {
+void Mobs::RenderEnemies(SDL_Rect camRect) {
+	SDL_Rect temp;
 	for (int i = 0; i < Enemies.size(); i++)
 	{
-		switch (Enemies[i]->getAnimation())
-		{
-			case 2:
-				SDL_RenderCopy(renderer, Enemies[i]->texture, NULL, Enemies[i]->GetRectangle());
-				break;
+		if (Enemies[i]->GetRenderable()) {
+			temp.x = Enemies[i]->GetRectangle()->x - camRect.x;
+			temp.y = Enemies[i]->GetRectangle()->y - camRect.y;
+			temp.w = Enemies[i]->GetRectangle()->w;
+			temp.h = Enemies[i]->GetRectangle()->h;
+			switch (Enemies[i]->getAnimation())
+			{
+				case 2:
+					SDL_RenderCopy(renderer, Enemies[i]->texture, NULL, &temp);
+					break;
 
-			case 1:
-				SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-				SDL_RenderCopyEx(renderer, Enemies[i]->texture, NULL, Enemies[i]->GetRectangle(), 0.0, NULL, flip);
-				break;
+				case 1:
+					SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
+					SDL_RenderCopyEx(renderer, Enemies[i]->texture, NULL, &temp, 0.0, NULL, flip);
+					break;
+			}
 		}
 	}
 }
 
-void Mobs::Render() {
-	RenderEnemies();
+void Mobs::Render(SDL_Rect camRect) {
+	RenderEnemies(camRect);
 }
 
 

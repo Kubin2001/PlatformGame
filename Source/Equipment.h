@@ -9,9 +9,13 @@ class ShortSword
     private:
         SDL_Rect rectangle;
         int damage = 10;
+        bool renderable = false;
 
     public:
         SDL_Rect* GetRectangle();
+        bool GetRenderable();
+
+        void SetRenderable(bool temp);
 
 };
 
@@ -30,9 +34,9 @@ class Equipment
         void SetTextureShortSword(SDL_Texture* temptex);
         void LoadEquipment();
         void MoveEquipment(const Uint8* state, Player* player);
-        void DetectCollison(Player* player);
-        void Render();
-        void RenderShortSword();
+        void DetectCollison(Player* player, SDL_Rect camRect);
+        void Render(SDL_Rect camRect);
+        void RenderShortSword(SDL_Rect camRect);
 
         ~Equipment();
 };

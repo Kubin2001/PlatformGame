@@ -4,6 +4,7 @@
 #include "Mobs.h"
 #include "Colision.h"
 #include "ParticlesManager.h"
+#include "Camera.h"
 
 extern int windowtype;
 extern int localWindow;
@@ -84,7 +85,13 @@ void Player::setDamageBuffer(int value) {
 	damageBuffer = value;
 }
 //Getters and setters
-void Player::Render() {
+void Player::Render(SDL_Rect camRect) {
+	SDL_Rect temp;
+	temp.x = GetRectangle()->x - camRect.x;
+	temp.y = GetRectangle()->y - camRect.y;
+	temp.w = GetRectangle()->w;
+	temp.h = GetRectangle()->h;
+
 	if (damageBuffer % 10 == 0 && damageBuffer > 0) {
 
 	}
@@ -93,15 +100,20 @@ void Player::Render() {
 		switch (animation)
 		{
 		case 1:
-			SDL_RenderCopy(renderer, texture, NULL, &rectangle);
+			SDL_RenderCopy(renderer, texture, NULL, &temp);
 			break;
 		case 2:
 			SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-			SDL_RenderCopyEx(renderer, texture, NULL, &rectangle, 0.0, NULL, flip);
+			SDL_RenderCopyEx(renderer, texture, NULL, &temp, 0.0, NULL, flip);
 			break;
 		}
 	}
 	if (weapon != nullptr) {
+		SDL_Rect temp2;
+		temp2.x = weapon->GetRectangle()->x - camRect.x;
+		temp2.y = weapon->GetRectangle()->y - camRect.y;
+		temp2.w = weapon->GetRectangle()->w;
+		temp2.h = weapon->GetRectangle()->h;
 		SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
 		switch (animation)
 		{
@@ -109,10 +121,10 @@ void Player::Render() {
 			switch (weapon->GetAnimation())
 			{
 				case 1:
-					SDL_RenderCopy(renderer, weapon->GetTexture(), NULL, weapon->GetRectangle());
+					SDL_RenderCopy(renderer, weapon->GetTexture(), NULL, &temp2);
 					break;
 				case 2:
-					SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, weapon->GetRectangle(), 30.0, NULL, SDL_FLIP_NONE);
+					SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, &temp2, 30.0, NULL, SDL_FLIP_NONE);
 					break;
 			}
 			
@@ -121,10 +133,10 @@ void Player::Render() {
 			switch (weapon->GetAnimation())
 			{
 			case 1:
-				SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, weapon->GetRectangle(), 0.0, NULL, flip);
+				SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, &temp2, 0.0, NULL, flip);
 				break;
 			case 2:
-				SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, weapon->GetRectangle(), -30.0, NULL, flip);
+				SDL_RenderCopyEx(renderer, weapon->GetTexture(), NULL, &temp2, -30.0, NULL, flip);
 				break;
 			}
 			
@@ -133,19 +145,53 @@ void Player::Render() {
 	}
 }
 
+void Player::Move(const Uint8* state) {
+
+	int speed = 4;
+	if (state[SDL_SCANCODE_LEFT] && !getColison(0))
+	{
+		GetRectangle()->x -= speed;
+		setanimation(2);
+	}
+	else if (state[SDL_SCANCODE_RIGHT] && !getColison(2))
+	{
+		GetRectangle()->x += speed;
+		setanimation(1);
+	}
+}
+
 void Player::Jump(const Uint8* state) {
-	if (JumpBuffer <= 0 && getColison(1) == true) {
+	if (JumpBuffer <= 0 && getColison(1)) {
 		if (state[SDL_SCANCODE_UP]) {
-			JumpBuffer += 60;
+			JumpBuffer = 30;
 		}
 	}
 	else
 	{
 		JumpBuffer--;
+		if (JumpBuffer < 0) {
+			JumpBuffer = 0;
+		}
+	}
+	if (!getColison(3)) {
+		if (getJumpBuffer() > 6) {
+			GetRectangle()->y -= 12;
+		}
+		else if (getJumpBuffer() > 3) {
+			GetRectangle()->y -= 8;
+		}
+		else if (getJumpBuffer() > 0) {
+			GetRectangle()->y -= 6;
+		}
+	}
+	else
+	{
+		JumpBuffer = 0;
 	}
 
-	if (JumpBuffer < 0) {
-		JumpBuffer = 0;
+
+	if (!getColison(1)) {
+		GetRectangle()->y += 5;
 	}
 }
 

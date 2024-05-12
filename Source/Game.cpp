@@ -7,10 +7,14 @@
 extern int windowtype;
 extern int localWindow;
 extern bool status;
+extern int windowWidth;
+extern int windowHeight;
 
 Game::Game() {
     window = nullptr;
     renderer = nullptr;
+
+    camera = nullptr;
     player = nullptr;
     map = nullptr;
     mobs = nullptr;
@@ -22,7 +26,7 @@ Game::Game() {
 
 void Game::SetUpWindow() {
     SDL_Init(SDL_INIT_EVERYTHING);
-    window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1400, 800, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Platform", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 }
@@ -38,6 +42,7 @@ void Game::Start() {
             ui->CreateButton();
             break;
         case 2:
+            camera = new Camera;
             ui = new UI(renderer);
             ui->font->LoadText(40, 29, 29);
             map = new Map(renderer);
@@ -122,11 +127,11 @@ void Game::Events() {
             player->setColison(false, 2);
             player->setColison(false, 3);
             player->CheckDamage(ui);
-            map->DetectColison(player,ui);
-            mobs->DetectColison(player, map);
-            particlesManager->CheckColision(mobs,player);
+            map->DetectColison(player,ui,camera);
+            mobs->DetectColison(player, map,*camera->GetRectangle());
+            particlesManager->CheckColision(mobs,player,*camera->GetRectangle());
             particlesManager->EndLifeTime();
-            equipment->DetectCollison(player);
+            equipment->DetectCollison(player,*camera->GetRectangle());
             player->UpdateWeapon();
             break;
         case 3:
@@ -158,6 +163,8 @@ void Game::Movement() {
         break;
     case 2:
         player->Jump(state);
+        player->Move(state);
+        camera->UpdatePosition(*player->GetRectangle());
         player->Attack(state,particlesManager);
         map->MoveMap(state, player);
         mobs->MoveMobs(state, player,map,particlesManager);
@@ -179,12 +186,12 @@ void Game::Render() {
         ui->Render();
         break;
     case 2:
-        player->Render();
-        map->Render();
-        mobs->Render();
+        player->Render(*camera->GetRectangle());
+        map->Render(*camera->GetRectangle());
+        mobs->Render(*camera->GetRectangle());
         ui->Render();
-        equipment->Render();
-        particlesManager->Render();
+        equipment->Render(*camera->GetRectangle());
+        particlesManager->Render(*camera->GetRectangle());
         break;
     case 3:
         levelEditor->Render();
@@ -199,6 +206,7 @@ void Game::Clear() {
         delete ui;
         break;
     case 2:
+        delete camera;
         delete ui;
         delete player;
         delete map;
