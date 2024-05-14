@@ -61,6 +61,8 @@ class LevelEditor
 
         void DeleteObject(SDL_Event event);
 
+        void CopyObject(SDL_Event event);
+
         void Settings(SDL_Event event);
 
         void Move(SDL_Event event);

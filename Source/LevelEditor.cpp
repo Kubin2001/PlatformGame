@@ -153,6 +153,7 @@ void LevelEditor::OnClick(SDL_Event event) {
     Move(event);
     ChangeScales(event);
     UpdateKeyboard(event);
+    CopyObject(event);
     DeleteObject(event);
     
 }
@@ -245,6 +246,25 @@ void LevelEditor::DeleteObject(SDL_Event event) {
         {
             if (SimpleCollision(mouse, objects[i].rect) == 1) {
                 objects.erase(objects.begin() + i);
+            }
+        }
+    }
+}
+
+void LevelEditor::CopyObject(SDL_Event event) {
+    if (event.key.keysym.scancode == SDL_SCANCODE_C) {
+        SDL_GetMouseState(&mouse.x, &mouse.y);
+        mouse.w = 1;
+        mouse.h = 1;
+        for (int i = 0; i < objects.size(); i++)
+        {
+            if (SimpleCollision(mouse, objects[i].rect) == 1) {
+                clickBuffer = 10;
+                clickRectangle = objects[i].rect;
+                clickTexture = objects[i].text;
+                currentName = objects[i].name;
+                clicked = true;
+                menu = -1;
             }
         }
     }
@@ -423,7 +443,18 @@ void LevelEditor::Render() {
 
 void LevelEditor::LoadFile() {
     PleacedObject obj;
-    std::ifstream levelFile("Editor/Input/inputLevel.txt");
+
+    std::string directory = "Editor/Input";
+    std::string pathString = "";
+    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory))
+    {
+        if (entry.path().extension() == ".txt") {
+            pathString = entry.path().string();
+            pathString = pathString.substr(directory.length() +1, pathString.length());
+            break;
+        }
+    }
+    std::ifstream levelFile(directory + '/' + pathString);
     std::string line;
     objects.clear();
     if (levelFile.is_open()) {

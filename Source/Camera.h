@@ -8,8 +8,9 @@ extern int windowHeight;
 class Camera
 {
     private:
-        //SDL_Rect rectangle{0,0,windowWidth,windowHeight};
-        SDL_Rect rectangle{0,0,windowWidth/2,windowHeight/2};
+        SDL_Rect rectangle{0,0,windowWidth,windowHeight};
+        //SDL_Rect rectangle{0,0,windowWidth/2,windowHeight/2};
+        //SDL_Rect rectangle{0,0,(windowWidth - 100),(windowHeight- 100)};
 
     public:
         Camera();
