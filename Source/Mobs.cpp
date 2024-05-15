@@ -61,6 +61,45 @@ bool Enemy::GetRenderable() { return renderable; }
 
 void Enemy::SetRenderable(bool temp) { renderable = temp; }
 
+void Enemy::LoadAnimations(int step) {
+	if (animationCount == 0) {
+		return;
+	}
+	SDL_Rect temp;
+	int xPos = 1;
+	for (int i = 0; i < animationCount; i++)
+	{
+		sourceRectangle.push_back(temp);
+		sourceRectangle[i].x = xPos;
+		sourceRectangle[i].y = 1;
+		sourceRectangle[i].w = 40;
+		sourceRectangle[i].h = 90;
+		xPos += step;
+	}
+}
+
+SDL_Rect* Charger::ChooseAnimation() {
+	return NULL;
+}
+
+SDL_Rect* Wolf::ChooseAnimation() {
+	return NULL;
+}
+
+SDL_Rect* Pirate::ChooseAnimation() {
+	animationTimer++;
+	if (animationTimer > 50) {
+		animationTimer = 0;
+	}
+	if (animationTimer < 25) {
+		return &sourceRectangle[0];
+	}
+	else
+	{
+		return &sourceRectangle[1];
+	}
+}
+
 void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
 	if (cProj == nullptr) {
 		switch (animation)
@@ -340,6 +379,7 @@ void Mobs::LoadMobs() {
 				getline(levelFile, line);
 				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
 				Enemies[Enemies.size() - 1]->texture = texturePirate;
+				Enemies[Enemies.size() - 1]->LoadAnimations(41);
 
 			}
 		}
@@ -453,14 +493,17 @@ void Mobs::RenderEnemies(SDL_Rect camRect) {
 			temp.h = Enemies[i]->GetRectangle()->h;
 			switch (Enemies[i]->getAnimation())
 			{
-				case 2:
-					SDL_RenderCopy(renderer, Enemies[i]->texture, NULL, &temp);
-					break;
-
-				case 1:
+				case 1: {
 					SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-					SDL_RenderCopyEx(renderer, Enemies[i]->texture, NULL, &temp, 0.0, NULL, flip);
+					SDL_RenderCopyEx(renderer, Enemies[i]->texture, Enemies[i]->ChooseAnimation(), &temp, 0.0, NULL, flip);
 					break;
+					}
+
+				case 2:
+					SDL_RenderCopy(renderer, Enemies[i]->texture, Enemies[i]->ChooseAnimation(), &temp);
+					break;
+					
+
 			}
 		}
 	}

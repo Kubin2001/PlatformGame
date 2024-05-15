@@ -25,6 +25,11 @@ class Enemy {
 		bool renderable = false;
 
 	public:
+
+		std::vector<SDL_Rect> sourceRectangle;
+		int animationCount = 0;
+		int animationTimer = 0;
+
 		SDL_Texture* texture;
 
 		virtual SDL_Rect* GetRectangle();
@@ -49,9 +54,11 @@ class Enemy {
 
 		virtual void SetRenderable(bool temp);
 
+		virtual void LoadAnimations(int step);
+
+		virtual SDL_Rect* ChooseAnimation() = 0;
+
 		virtual void Movement(Player* player, Map* map, ParticlesManager* particleManager) = 0;
-
-
 };
 
 class Wolf : public Enemy{
@@ -62,9 +69,12 @@ class Wolf : public Enemy{
 	public:
 		Wolf() {
 			hitPoints = 20;
+			animationCount = 0;
 		}
 
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		SDL_Rect* ChooseAnimation()override;
 
 		~Wolf() {
 			delete cProj;
@@ -76,9 +86,12 @@ class Charger : public Enemy{
 	public:
 		Charger() {
 			hitPoints = 10;
+			animationCount = 0;
 		}
 
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		SDL_Rect* ChooseAnimation()override;
 };
 
 class Pirate : public Enemy {
@@ -91,9 +104,12 @@ class Pirate : public Enemy {
 	public:
 		Pirate() {
 			hitPoints = 40;
+			animationCount = 2;
 		}
 
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		SDL_Rect* ChooseAnimation()override;
 
 		~Pirate() {
 			delete cProj;

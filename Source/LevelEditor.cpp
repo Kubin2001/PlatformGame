@@ -54,7 +54,7 @@ void LoadHelper(std::vector<PleacedObject>& vector, std::string directory, SDL_R
 
 void LevelEditor::LoadTextures() {
     std::string terrain = "Textures/Terrain";
-    std::string mobs = "Textures/Mobs";
+    std::string mobs = "Textures/MobsEditor";
     std::string equipment = "Textures/Equipment";
     LoadHelper(mapObjects, terrain, renderer);
     LoadHelper(mobsObjects, mobs, renderer);
@@ -86,9 +86,9 @@ void LevelEditor::OnClick(SDL_Event event) {
                     rectangles.push_back(rect);
                     rectangles[rectangles.size() - 1].x = posX;
                     rectangles[rectangles.size() - 1].y = posY;
-                    rectangles[rectangles.size() - 1].w = 100;
-                    rectangles[rectangles.size() - 1].h = 100;
-                    posX += 200;
+                    rectangles[rectangles.size() - 1].w = 70;
+                    rectangles[rectangles.size() - 1].h = 70;
+                    posX += 80;
                 }
                 break;
             case 1://Mobs
@@ -97,9 +97,9 @@ void LevelEditor::OnClick(SDL_Event event) {
                     rectangles.push_back(rect);
                     rectangles[rectangles.size() - 1].x = posX;
                     rectangles[rectangles.size() - 1].y = posY;
-                    rectangles[rectangles.size() - 1].w = 100;
-                    rectangles[rectangles.size() - 1].h = 100;
-                    posX += 200;
+                    rectangles[rectangles.size() - 1].w = 70;
+                    rectangles[rectangles.size() - 1].h = 70;
+                    posX += 80;
                 }
                 break;
             case 2://Equipment
@@ -108,9 +108,9 @@ void LevelEditor::OnClick(SDL_Event event) {
                     rectangles.push_back(rect);
                     rectangles[rectangles.size() - 1].x = posX;
                     rectangles[rectangles.size() - 1].y = posY;
-                    rectangles[rectangles.size() - 1].w = 100;
-                    rectangles[rectangles.size() - 1].h = 100;
-                    posX += 200;
+                    rectangles[rectangles.size() - 1].w = 70;
+                    rectangles[rectangles.size() - 1].h = 70;
+                    posX += 80;
                 }
                 break;
             case 4://Reset
