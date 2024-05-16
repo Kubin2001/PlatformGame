@@ -1,10 +1,12 @@
 #include <iostream>
+#include "SDL_mixer.h"
 #include "Player.h"
 #include "UI.h"
 #include "Mobs.h"
 #include "Colision.h"
 #include "ParticlesManager.h"
 #include "Camera.h"
+#include "SoundManager.h"
 
 extern int windowtype;
 extern int localWindow;
@@ -161,9 +163,10 @@ void Player::Move(const Uint8* state) {
 }
 
 void Player::Jump(const Uint8* state) {
-	if (JumpBuffer <= 0 && getColison(1)) {
+	if (JumpBuffer <= 0 && getColison(1) && !getColison(3)) {
 		if (state[SDL_SCANCODE_UP]) {
 			JumpBuffer = 30;
+			SoundManager::PlayPlayerJumpSound();
 		}
 	}
 	else
@@ -201,9 +204,14 @@ void Player::CheckDamage(UI * ui) {
 		ui->RemoveHearths();
 		damageBuffer = 100;
 		if (ui->getHP().size() == 0) {
+			SoundManager::PlayPlayerLoseSound();
 			ui->CreateButtonInfo(550, 250, 300, 100, "YOU LOST", 30, 31);
 			SDL_Delay(5000);
 			localWindow = 1;
+		}
+		else
+		{
+			SoundManager::PlayPlayerHurtSound();
 		}
 	}
 	damage = false;
@@ -245,6 +253,7 @@ void Player::Attack(const Uint8* state, ParticlesManager* particleManager) {
 	if (armed) {
 		if (attackBuffer <= 0) {
 			if (state[SDL_SCANCODE_SPACE]) {
+				SoundManager::PlayPlayerAttackSound();
 				attackBuffer = 60;
 				weapon->SetAnimation(2);
 				SDL_Rect rect{ weapon->GetRectangle()->x ,GetRectangle()->y ,30,80 };
@@ -267,9 +276,12 @@ void Player::Attack(const Uint8* state, ParticlesManager* particleManager) {
 	}
 }
 
+
 Player::~Player() {
 	SDL_DestroyTexture(texture);
+
 	if (weapon != nullptr) {
 		delete weapon;
+		weapon = nullptr;
 	}
 }

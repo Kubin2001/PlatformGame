@@ -8,8 +8,10 @@
 #include "Colision.h"
 #include "Map.h"
 #include "Camera.h"
+#include "SoundManager.h"
 
 extern std::string levelName;
+
 
 Mobs::Mobs(SDL_Renderer* renderer) {
 	this->renderer = renderer;
@@ -60,6 +62,10 @@ int Enemy::getInvTime() {
 bool Enemy::GetRenderable() { return renderable; }
 
 void Enemy::SetRenderable(bool temp) { renderable = temp; }
+
+bool Enemy::GetJumpable() {
+	return jumpable;
+}
 
 void Enemy::LoadAnimations(int step) {
 	if (animationCount == 0) {
@@ -128,6 +134,7 @@ void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager)
 		if (SimpleCollision(*cProj->GetRectangle(), *player->GetRectangle()) == 1) {
 			cProj->SetTimer(50);
 			if (agroo == 0) {
+				SoundManager::PlayWolfGrowlSound();
 				agroo = 300;
 			}
 		}
@@ -214,10 +221,10 @@ void Pirate::Movement(Player* player, Map* map, ParticlesManager* particleManage
 			switch (animation)
 			{
 			case 1:
-				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y+10, 1, 1, 30, 0);
+				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y+30, 1, 1, 30, 0);
 				break;
 			case 2:
-				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y+10, 1, 1, -30, 0);
+				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y+30, 1, 1, -30, 0);
 				break;
 			}
 		}
@@ -287,9 +294,11 @@ void Pirate::Movement(Player* player, Map* map, ParticlesManager* particleManage
 			switch (animation)
 			{
 				case 1:
+					SoundManager::PlayPirateAttackSound();
 					particleManager->CreateEnemyAttackParticles(rect, 1, 6, 35);
 					break;
 				case 2:
+					SoundManager::PlayPirateAttackSound();
 					particleManager->CreateEnemyAttackParticles(rect, 2, -6, 35);
 					break;
 			}
@@ -450,12 +459,16 @@ void Mobs::DetectColison(Player* player,Map *map, SDL_Rect camRect) {
 				player->SetDamage(true);
 				break;
 			case 2:
-				player->setColison(true, 1);
-				player->setJumpBuffer(15);
-				Enemies[i]->setHitPoints(Enemies[i]->getHitPoints() - 10);
-				if (Enemies[i]->getHitPoints() < 1) {
-					delete Enemies[i];
-					Enemies.erase(Enemies.begin() + i);
+				if (Enemies[i]->GetJumpable()) {
+					player->setColison(true, 1);
+					player->setJumpBuffer(15);
+					SoundManager::PlayPlayerJumpSound();
+					Enemies[i]->setHitPoints(Enemies[i]->getHitPoints() - 10);
+					if (Enemies[i]->getHitPoints() < 1) {
+						SoundManager::PlayEnemyDeathSound();
+						delete Enemies[i];
+						Enemies.erase(Enemies.begin() + i);
+					}
 				}
 				break;
 			case 3:

@@ -1,6 +1,8 @@
 #include <SDL.h>
 #include <iostream>
 #include "SDL_image.h"
+#include "SDL_mixer.h"
+#include "SoundManager.h"
 
 #include "Game.h"
 
@@ -28,6 +30,7 @@ void Game::SetUpWindow() {
     SDL_Init(SDL_INIT_EVERYTHING);
     window = SDL_CreateWindow("Platform", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, 0);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 }
 
@@ -55,6 +58,7 @@ void Game::Start() {
             mobs->LoadMobs();
             ui->CreateHearths();
             equipment->LoadEquipment();
+            SoundManager::Load();
             break;
         case 3:
             levelEditor = new LevelEditor(renderer);
@@ -213,6 +217,7 @@ void Game::Clear() {
         delete mobs;
         delete equipment;
         delete particlesManager;
+        SoundManager::UnLoad();
         break;
     case 3:
         delete levelEditor;

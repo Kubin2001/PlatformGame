@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#include "SDL_mixer.h"
 #include "UI.h"
 #include "Mobs.h"
 #include "ParticlesManager.h"
@@ -93,6 +94,8 @@ class Player {
 		void UpdateWeapon();
 
 		void Attack(const Uint8* state, ParticlesManager* particleManager);
+
+		void PlayJumpSound();
 
 		~Player();
 };

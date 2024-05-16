@@ -3,6 +3,8 @@
 #include <SDL.h>
 #include <vector>
 #include <cstdlib>
+#include "SDL_mixer.h"
+#include <ctime>
 #include "player.h"
 #include "Map.h"
 #include "UI.h"
@@ -18,14 +20,15 @@ class Enemy {
 	protected:
 		SDL_Rect rectangle;
 		int movementtype = 1;
+		static int enemyCount;
 		int animation = 2;
 		int hitPoints = 20;
 		bool colision[4] = { 0,0,0,0 };
 		int invTime = 0;
 		bool renderable = false;
+		bool jumpable = false;
 
 	public:
-
 		std::vector<SDL_Rect> sourceRectangle;
 		int animationCount = 0;
 		int animationTimer = 0;
@@ -54,6 +57,8 @@ class Enemy {
 
 		virtual void SetRenderable(bool temp);
 
+		virtual bool GetJumpable();
+
 		virtual void LoadAnimations(int step);
 
 		virtual SDL_Rect* ChooseAnimation() = 0;
@@ -61,37 +66,43 @@ class Enemy {
 		virtual void Movement(Player* player, Map* map, ParticlesManager* particleManager) = 0;
 };
 
-class Wolf : public Enemy{
-	private:
-		CollisonProjectile* cProj;
-		int agroo = 0;
-
-	public:
-		Wolf() {
-			hitPoints = 20;
-			animationCount = 0;
-		}
-
-		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
-
-		SDL_Rect* ChooseAnimation()override;
-
-		~Wolf() {
-			delete cProj;
-			cProj = nullptr;
-		}
-};
-
 class Charger : public Enemy{
 	public:
 		Charger() {
 			hitPoints = 10;
 			animationCount = 0;
+			jumpable = true;
 		}
 
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
 
 		SDL_Rect* ChooseAnimation()override;
+		~Charger() {
+		}
+};
+
+class Wolf : public Enemy {
+private:
+	CollisonProjectile* cProj;
+	int agroo = 0;
+	static int wolfCount; 
+
+public:
+	Wolf() {
+		hitPoints = 20;
+		animationCount = 0;
+		jumpable = true;
+	}
+
+	void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+	SDL_Rect* ChooseAnimation()override;
+
+	~Wolf() {
+		delete cProj;
+		cProj = nullptr;
+
+	}
 };
 
 class Pirate : public Enemy {
@@ -105,6 +116,7 @@ class Pirate : public Enemy {
 		Pirate() {
 			hitPoints = 40;
 			animationCount = 2;
+			animationTimer = rand() % 30;
 		}
 
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
