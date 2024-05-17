@@ -16,30 +16,28 @@ Mix_Chunk* SoundManager::soundPirateAttack = nullptr;
 SoundManager::SoundManager() {
 }
 
-void SoundManager::Load(){
-	switch (windowtype)
-	{
-		case 1:
-			break;
+void SoundManager::LoadMenu() {
 
-		case 2:
-			//Player
-			soundJump = Mix_LoadWAV("Sounds/Player/jump.wav");
-			soundAttack = Mix_LoadWAV("Sounds/Player/attack.wav");
-			soundHurt = Mix_LoadWAV("Sounds/Player/hurt.wav");
-			soundLose = Mix_LoadWAV("Sounds/Player/lose.wav");
-			//Player
-			//Mobs
-			soundGrowl = Mix_LoadWAV("Sounds/Mobs/wolfGrowl.wav");
-			soundDeath = Mix_LoadWAV("Sounds/Mobs/mobDeath.wav");
-			soundPirateAttack = Mix_LoadWAV("Sounds/Mobs/pirateAttack.wav");
-			//Mobs
-			break;
-
-		case 3:
-			break;
-	}
 }
+
+void SoundManager::LoadGame() {
+	//Player
+	soundJump = Mix_LoadWAV("Sounds/Player/jump.wav");
+	soundAttack = Mix_LoadWAV("Sounds/Player/attack.wav");
+	soundHurt = Mix_LoadWAV("Sounds/Player/hurt.wav");
+	soundLose = Mix_LoadWAV("Sounds/Player/lose.wav");
+	//Player
+	//Mobs
+	soundGrowl = Mix_LoadWAV("Sounds/Mobs/wolfGrowl.wav");
+	soundDeath = Mix_LoadWAV("Sounds/Mobs/mobDeath.wav");
+	soundPirateAttack = Mix_LoadWAV("Sounds/Mobs/pirateAttack.wav");
+	//Mobs
+}
+
+void SoundManager::LoadEditor() {
+
+}
+
 
 void SoundManager::PlayPlayerJumpSound() {
 	Mix_PlayChannel(-1, soundJump, 0);
@@ -70,33 +68,28 @@ void SoundManager::PlayPirateAttackSound() {
 	Mix_PlayChannel(-1, soundPirateAttack, 0);
 }
 
-void SoundManager::UnLoad() {
-	switch (windowtype)
-	{
-		case 1:
-			break;
+void SoundManager::UnLoadMenu() {
 
-		case 2:
-			Mix_FreeChunk(soundDeath);
-			soundDeath = nullptr;
-			Mix_FreeChunk(soundGrowl);
-			soundGrowl = nullptr;
-			Mix_FreeChunk(soundJump);
-			soundJump = nullptr;
-			Mix_FreeChunk(soundAttack);
-			soundAttack = nullptr;
-			Mix_FreeChunk(soundHurt);
-			soundHurt = nullptr;
-			Mix_FreeChunk(soundLose);
-			soundLose = nullptr;
-			Mix_FreeChunk(soundPirateAttack);
-			soundPirateAttack = nullptr;
-			break;
+}
 
-		case 3:
-			break;
-	}
+void SoundManager::UnLoadGame() {
+	Mix_FreeChunk(soundDeath);
+	soundDeath = nullptr;
+	Mix_FreeChunk(soundGrowl);
+	soundGrowl = nullptr;
+	Mix_FreeChunk(soundJump);
+	soundJump = nullptr;
+	Mix_FreeChunk(soundAttack);
+	soundAttack = nullptr;
+	Mix_FreeChunk(soundHurt);
+	soundHurt = nullptr;
+	Mix_FreeChunk(soundLose);
+	soundLose = nullptr;
+	Mix_FreeChunk(soundPirateAttack);
+	soundPirateAttack = nullptr;
+}
 
+void SoundManager::UnLoadEditor() {
 
 }
 

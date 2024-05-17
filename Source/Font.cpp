@@ -161,10 +161,10 @@ void Font::RenderText(SDL_Renderer* renderer, std::string text, int x, int y, in
         case '/':
             rectangle.y += step;
             rectangle.x = x - step;
+            break;
            
         default:
             break;
-
         }
         rectangle.x += step;
     }

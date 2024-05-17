@@ -24,12 +24,9 @@ class Object {
 
 class MapObject : public Object {
 	private:
-		SDL_Rect rectangle;
 		SDL_Texture* texture;
-		bool renderable = false;
 
 	public:
-
 		SDL_Texture* GetTexture();
 
 		void SetTexture(SDL_Texture* temptex);
@@ -38,15 +35,12 @@ class MapObject : public Object {
 
 class Flag : public Object  {
 	private:
-		SDL_Rect rectangle;
-		bool renderable = false;
 
 	public:
 };
 
 class InvWall : public Object {
 	private:
-		SDL_Rect rectangle;
 
 	public:
 };

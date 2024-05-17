@@ -18,12 +18,17 @@ class SoundManager
         static Mix_Chunk* soundGrowl;
         static Mix_Chunk* soundDeath;
         static Mix_Chunk* soundPirateAttack;
+        //Mobs
 
 
     public:
         SoundManager();
 
-        static void Load();
+        static void LoadMenu();
+
+        static void LoadGame();
+
+        static void LoadEditor();
 
         static void PlayPlayerJumpSound();
 
@@ -39,7 +44,11 @@ class SoundManager
 
         static void PlayPirateAttackSound();
 
-        static void UnLoad();
+        static void UnLoadMenu();
+
+        static void UnLoadGame();
+
+        static void UnLoadEditor();
 
         ~SoundManager();
 };

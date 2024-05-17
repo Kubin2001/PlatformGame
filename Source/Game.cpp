@@ -58,7 +58,7 @@ void Game::Start() {
             mobs->LoadMobs();
             ui->CreateHearths();
             equipment->LoadEquipment();
-            SoundManager::Load();
+            SoundManager::LoadGame();
             break;
         case 3:
             levelEditor = new LevelEditor(renderer);
@@ -217,7 +217,7 @@ void Game::Clear() {
         delete mobs;
         delete equipment;
         delete particlesManager;
-        SoundManager::UnLoad();
+        SoundManager::UnLoadGame();
         break;
     case 3:
         delete levelEditor;

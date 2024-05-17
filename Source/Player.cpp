@@ -200,7 +200,7 @@ void Player::Jump(const Uint8* state) {
 
 
 void Player::CheckDamage(UI * ui) {
-	if (damage == true && damageBuffer < 0) {
+	if (damage && damageBuffer < 0) {
 		ui->RemoveHearths();
 		damageBuffer = 100;
 		if (ui->getHP().size() == 0) {
@@ -237,12 +237,12 @@ void Player::UpdateWeapon() {
 		switch (animation)
 		{
 		case 1:
-			weapon->GetRectangle()->x = GetRectangle()->x + GetRectangle()->w * 0.7;
-			weapon->GetRectangle()->y = GetRectangle()->y + GetRectangle()->h * 0.2;
+			weapon->GetRectangle()->x = GetRectangle()->x + (GetRectangle()->w - 10);
+			weapon->GetRectangle()->y = (GetRectangle()->y + 30) - weapon->GetRectangle()->h;
 			break;
 		case 2:
-			weapon->GetRectangle()->x = GetRectangle()->x - 10;
-			weapon->GetRectangle()->y = GetRectangle()->y + GetRectangle()->h * 0.2;
+			weapon->GetRectangle()->x = GetRectangle()->x - weapon->GetRectangle()->w + 10;
+			weapon->GetRectangle()->y = (GetRectangle()->y + 30) - weapon->GetRectangle()->h;
 			break;
 		}
 	}

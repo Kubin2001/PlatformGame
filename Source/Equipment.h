@@ -16,7 +16,6 @@ class ShortSword
         bool GetRenderable();
 
         void SetRenderable(bool temp);
-
 };
 
 

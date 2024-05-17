@@ -23,10 +23,10 @@ private:
 	ParticlesManager* particlesManager;
 	LevelEditor* levelEditor;
 	
-	SDL_Texture* textback;
+	SDL_Texture* textback = nullptr;
 	bool renderBack = true;
 	SDL_Rect rectback{0,0,1400,800};
-	SDL_Event event;
+	SDL_Event event = {};
 
 public:
 	Game();

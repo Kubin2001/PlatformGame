@@ -21,6 +21,14 @@ SDL_Rect* Enemy::GetRectangle() {
 	return &rectangle;
 }
 
+std::vector<SDL_Rect> &Enemy::GetSourceRectangle() {
+	return sourceRectangle;
+}
+
+void Enemy::setTexture(SDL_Texture* text) { texture = text; }
+
+SDL_Texture* Enemy::getTexture() { return texture; }
+
 int Enemy::getAnimation() {
 	return animation;
 }
@@ -361,7 +369,7 @@ void Mobs::LoadMobs() {
 				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
 				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Enemies[Enemies.size() - 1]->texture = textureCharger;
+				Enemies[Enemies.size() - 1]->setTexture(textureCharger);
 			}
 			else if (line == "wolf") {
 				Enemies.push_back(new Wolf());
@@ -373,8 +381,7 @@ void Mobs::LoadMobs() {
 				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
 				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Enemies[Enemies.size() - 1]->texture = textureWolf;
-
+				Enemies[Enemies.size() - 1]->setTexture(textureWolf);
 			}
 
 			else if (line == "pirate") {
@@ -387,7 +394,7 @@ void Mobs::LoadMobs() {
 				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
 				getline(levelFile, line);
 				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Enemies[Enemies.size() - 1]->texture = texturePirate;
+				Enemies[Enemies.size() - 1]->setTexture(texturePirate);
 				Enemies[Enemies.size() - 1]->LoadAnimations(41);
 
 			}
@@ -508,12 +515,12 @@ void Mobs::RenderEnemies(SDL_Rect camRect) {
 			{
 				case 1: {
 					SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-					SDL_RenderCopyEx(renderer, Enemies[i]->texture, Enemies[i]->ChooseAnimation(), &temp, 0.0, NULL, flip);
+					SDL_RenderCopyEx(renderer, Enemies[i]->getTexture(), Enemies[i]->ChooseAnimation(), &temp, 0.0, NULL, flip);
 					break;
 					}
 
 				case 2:
-					SDL_RenderCopy(renderer, Enemies[i]->texture, Enemies[i]->ChooseAnimation(), &temp);
+					SDL_RenderCopy(renderer, Enemies[i]->getTexture(), Enemies[i]->ChooseAnimation(), &temp);
 					break;
 					
 

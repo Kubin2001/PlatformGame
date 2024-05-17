@@ -38,7 +38,7 @@ void LoadHelper(std::vector<PleacedObject>& vector, std::string directory, SDL_R
             vector[vector.size() - 1].text = load(path, renderer);
             SDL_QueryTexture(vector[vector.size() - 1].text, NULL, NULL, &vector[vector.size() - 1].rect.w, &vector[vector.size() - 1].rect.h);
             std::string temp = "";
-            for (int i = directory.length(); i < pathString.length(); i++)
+            for (size_t i = directory.length(); i < pathString.length(); i++)
             {
                 if (pathString[i + 1] == '.') {
                     break;

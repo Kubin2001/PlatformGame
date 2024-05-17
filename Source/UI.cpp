@@ -34,7 +34,7 @@ std::vector<Hearth>& UI::getHP() {return HP;}
 void UI::Render() {
     if (windowtype == 1) {
         RenderButton();
-        for (int  i = 0; i < Buttons.size(); i++)
+        for (size_t  i = 0; i < Buttons.size(); i++)
         {
             int size = Buttons[i].GetRectangle()->w / Buttons[i].GetText().length() - 2;
             font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, size, size, size + 2);

@@ -16,7 +16,7 @@ class LevelEditor
 {
     private:
         UI* ui;
-        SDL_Renderer* renderer;
+        SDL_Renderer* renderer = nullptr;
         std::vector<PleacedObject> mapObjects;
         std::vector<PleacedObject> mobsObjects;
         std::vector<PleacedObject> equipmentObjects;
@@ -33,7 +33,7 @@ class LevelEditor
 
         SDL_Rect clickRectangle;
         SDL_Rect mouse;
-        SDL_Texture* clickTexture;
+        SDL_Texture* clickTexture = nullptr;;
         bool clicked = false;
         bool scaleWidth = true;
         int scaleSpeed = 1;

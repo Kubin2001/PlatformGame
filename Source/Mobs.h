@@ -18,7 +18,9 @@ class Map;
 
 class Enemy {
 	protected:
-		SDL_Rect rectangle;
+		SDL_Rect rectangle = {};
+		std::vector<SDL_Rect> sourceRectangle;
+		SDL_Texture* texture;
 		int movementtype = 1;
 		static int enemyCount;
 		int animation = 2;
@@ -28,14 +30,17 @@ class Enemy {
 		bool renderable = false;
 		bool jumpable = false;
 
-	public:
-		std::vector<SDL_Rect> sourceRectangle;
 		int animationCount = 0;
 		int animationTimer = 0;
 
-		SDL_Texture* texture;
-
+	public:
 		virtual SDL_Rect* GetRectangle();
+
+		virtual std::vector<SDL_Rect> &GetSourceRectangle();
+
+		virtual void setTexture(SDL_Texture* text);
+
+		virtual SDL_Texture * getTexture();
 
 		virtual int getAnimation();
 
