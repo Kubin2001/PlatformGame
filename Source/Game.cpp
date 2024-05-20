@@ -54,6 +54,7 @@ void Game::Start() {
             equipment = new Equipment(renderer);
             particlesManager = new ParticlesManager(renderer);
             LoadTextures();
+            player->LoadAnimations(48);
             map->CreateLevel();
             mobs->LoadMobs();
             ui->CreateHearths();
@@ -82,7 +83,10 @@ void Game::LoadTextures() {
         particlesManager->SetTexture(load("Textures/Particles/wave.png", renderer));
         map->SetTextureFloor(load("Textures/Terrain/grass.png", renderer));
         map->SetTexturePlatform(load("Textures/Terrain/platform.png", renderer));
+        map->SetTexturePlatform2(load("Textures/Terrain/platform2.png", renderer));
         map->SetTexturePilar(load("Textures/Terrain/pillar.png", renderer));
+        map->SetTexturePilar2(load("Textures/Terrain/pillar2.png", renderer));
+        map->SetTextureLava(load("Textures/Terrain/lava.png", renderer));
         //map->textureInvWall = load("Textures/Terrain/invWall.png", renderer);
         map->SetTextureFlag(load("Textures/Terrain/flag.png", renderer));
         mobs->SetTextureCharger(load("Textures/Mobs/charger.png", renderer));

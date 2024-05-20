@@ -32,7 +32,10 @@ class Player {
 	private:
 		SDL_Renderer* renderer = nullptr;
 		SDL_Texture* texture = nullptr;
-		SDL_Rect rectangle{ 700,400,32,70 };
+		SDL_Rect rectangle{ 700,400,46,104 };
+		std::vector<SDL_Rect> sourceRectangle;
+		int animationCount = 4;
+		int animationTimer = 0;
 		Weapon* weapon = nullptr;
 		int JumpBuffer = 0;
 		bool colision[4] = { 0,0,0,0 };
@@ -80,6 +83,9 @@ class Player {
 
 		void SetTextureAttackParticle(SDL_Texture* temptex);
 		//Getters and setters
+		void LoadAnimations(int step);
+
+		SDL_Rect* ChooseAnimation();
 
 		void Render(SDL_Rect camRect);
 

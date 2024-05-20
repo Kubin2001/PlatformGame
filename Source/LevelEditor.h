@@ -22,7 +22,7 @@ class LevelEditor
         std::vector<PleacedObject> equipmentObjects;
         PleacedObject mouseObject;
         SDL_Texture* texturePlayer;
-        SDL_Rect rectanglePlayer{ 700,400,32,70};
+        SDL_Rect rectanglePlayer{ 700,400,46,104};
         int menu = -1;
         std::vector<SDL_Rect> rectangles;
         std::vector<PleacedObject> objects;

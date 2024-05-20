@@ -33,6 +33,17 @@ class MapObject : public Object {
 };
 
 
+class Lava : public Object {
+	private:
+		SDL_Texture* texture;
+
+	public:
+		SDL_Texture* GetTexture();
+
+		void SetTexture(SDL_Texture* temptex);
+};
+
+
 class Flag : public Object  {
 	private:
 
@@ -54,10 +65,15 @@ class Map {
 		std::vector<Flag> Flags;
 		std::vector<InvWall> InvWalls;
 
+		std::vector<Lava> Lavas;
+
 		SDL_Texture* texturePlatform = nullptr;
+		SDL_Texture* texturePlatform2 = nullptr;
 		SDL_Texture* texturePillar = nullptr;
+		SDL_Texture* texturePillar2 = nullptr;
 		SDL_Texture* textureFlag = nullptr;
 		SDL_Texture* textureFloor = nullptr;
+		SDL_Texture* textureLava = nullptr;
 	
 	public:
 		//SDL_Texture* textureInvWall = nullptr;
@@ -73,15 +89,26 @@ class Map {
 
 		void SetTexturePlatform(SDL_Texture* temptex);
 
+		SDL_Texture* GetTexturePLatform2();
+
+		void SetTexturePlatform2(SDL_Texture* temptex);
+
 		SDL_Texture* GetTexturePilar();
 
 		void SetTexturePilar(SDL_Texture* temptex);
+
+		SDL_Texture* GetTexturePilar2();
+
+		void SetTexturePilar2(SDL_Texture* temptex);
 
 		SDL_Texture* GetTextureFlag();
 
 		void SetTextureFlag(SDL_Texture* temptex);
 
-		SDL_Rect* GetRectangle(int index);
+		SDL_Texture* GetTextureLava();
+
+		void SetTextureLava(SDL_Texture* temptex);
+
 		//getters and setters
 
 		void Render(SDL_Rect camRect);
@@ -96,11 +123,15 @@ class Map {
 
 		void RenderFlag(SDL_Rect camRect);
 
+		void RenderLava(SDL_Rect camRect);
+
 		std::vector<MapObject> &getMapObjects();
 
 		std::vector<Flag> &getFlag();
 
 		std::vector<InvWall>& getInvWalls();
+
+		std::vector<Lava>& getLavas();
 
 
 		~Map();

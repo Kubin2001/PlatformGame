@@ -87,6 +87,49 @@ void Player::setDamageBuffer(int value) {
 	damageBuffer = value;
 }
 //Getters and setters
+void Player::LoadAnimations(int step) {
+	if (animationCount == 0) {
+		return;
+	}
+	SDL_Rect temp;
+	int xPos = 1;
+	for (int i = 0; i < animationCount; i++)
+	{
+		sourceRectangle.push_back(temp);
+		sourceRectangle[i].x = xPos;
+		sourceRectangle[i].y = 0;
+		sourceRectangle[i].w = 47;
+		sourceRectangle[i].h = 105;
+		xPos += step;
+	}
+}
+
+SDL_Rect* Player::ChooseAnimation() {
+	if (animationTimer > 15) {
+		if (animationTimer > 30) {
+			animationTimer = 0;
+		}
+		if (armed) {
+			return &sourceRectangle[3];
+		}
+		else
+		{
+			return &sourceRectangle[2];
+		}
+	}
+	else
+	{
+		if (armed) {
+			return &sourceRectangle[1];
+		}
+		else
+		{
+			return &sourceRectangle[0];
+		}
+	}
+	
+}
+
 void Player::Render(SDL_Rect camRect) {
 	SDL_Rect temp;
 	temp.x = GetRectangle()->x - camRect.x;
@@ -102,11 +145,11 @@ void Player::Render(SDL_Rect camRect) {
 		switch (animation)
 		{
 		case 1:
-			SDL_RenderCopy(renderer, texture, NULL, &temp);
+			SDL_RenderCopy(renderer, texture, ChooseAnimation(), &temp);
 			break;
 		case 2:
 			SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-			SDL_RenderCopyEx(renderer, texture, NULL, &temp, 0.0, NULL, flip);
+			SDL_RenderCopyEx(renderer, texture, ChooseAnimation(), &temp, 0.0, NULL, flip);
 			break;
 		}
 	}
@@ -154,11 +197,13 @@ void Player::Move(const Uint8* state) {
 	{
 		GetRectangle()->x -= speed;
 		setanimation(2);
+		animationTimer++;
 	}
 	else if (state[SDL_SCANCODE_RIGHT] && !getColison(2))
 	{
 		GetRectangle()->x += speed;
 		setanimation(1);
+		animationTimer++;
 	}
 }
 
@@ -238,11 +283,11 @@ void Player::UpdateWeapon() {
 		{
 		case 1:
 			weapon->GetRectangle()->x = GetRectangle()->x + (GetRectangle()->w - 10);
-			weapon->GetRectangle()->y = (GetRectangle()->y + 30) - weapon->GetRectangle()->h;
+			weapon->GetRectangle()->y = (GetRectangle()->y + 50) - weapon->GetRectangle()->h;
 			break;
 		case 2:
 			weapon->GetRectangle()->x = GetRectangle()->x - weapon->GetRectangle()->w + 10;
-			weapon->GetRectangle()->y = (GetRectangle()->y + 30) - weapon->GetRectangle()->h;
+			weapon->GetRectangle()->y = (GetRectangle()->y + 50) - weapon->GetRectangle()->h;
 			break;
 		}
 	}
@@ -263,6 +308,9 @@ void Player::Attack(const Uint8* state, ParticlesManager* particleManager) {
 				else
 				{
 					particleManager->CreatePlayerAttackParticles(rect, 2, -8, 40);
+				}
+				if (!colision[1]) {
+					JumpBuffer += 20;
 				}
 			}
 		}

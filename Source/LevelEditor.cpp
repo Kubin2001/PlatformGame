@@ -15,14 +15,13 @@ LevelEditor::LevelEditor(SDL_Renderer* renderer) {
     this->renderer = renderer;
     ui = new UI(renderer);
     ui->font->LoadText(40, 29, 29);
-    ui->CreateSingleButton(300, 0, 200, 50, "TERRAIN", 26, 27);
-    ui->CreateSingleButton(600, 0, 200, 50, "MOBS", 29, 30);
-    ui->CreateSingleButton(900, 0, 200, 50, "EQUIPMENT", 20, 21);
+    ui->CreateSingleButton(50, 0, 250, 50, "TERRAIN", 26, 27);
+    ui->CreateSingleButton(350, 0, 250, 50, "MOBS", 29, 30);
+    ui->CreateSingleButton(650, 0, 250, 50, "EQUIPMENT", 20, 21);
+    ui->CreateSingleButton(950, 0, 250, 50, "DECORATIONS", 20, 21);
 
     ui->CreateSingleButton(1150, 100, 200, 50, "CLOSE", 20, 21);
-
     ui->CreateSingleButton(50, 100, 200, 50, "RESET", 20, 21);
-
     ui->CreateSingleButton(50, 200, 200, 50, "CREATE", 20, 21);
     ui->CreateSingleButton(50, 300, 200, 50, "LOAD", 20, 21);
 }
@@ -60,7 +59,7 @@ void LevelEditor::LoadTextures() {
     LoadHelper(mobsObjects, mobs, renderer);
     LoadHelper(equipmentObjects, equipment, renderer);
 
-    texturePlayer = load("Textures/player.png", renderer);
+    texturePlayer = load("Textures/playerEditor.png", renderer);
 
     ui->SetTextureButton(load("Textures/Interface/button.png", renderer));
     ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
@@ -71,8 +70,6 @@ void LevelEditor::LoadTextures() {
 void LevelEditor::OnClick(SDL_Event event) {
     ui->OnClickEditor(menu,event);
     SDL_Rect rect;
-    int posX = 200;
-    int posY = 400;
     if (menu != -1) {
         SDL_Rect rect;
         int posX = 200;
@@ -113,14 +110,18 @@ void LevelEditor::OnClick(SDL_Event event) {
                     posX += 80;
                 }
                 break;
-            case 4://Reset
+            case 3://Decorations
+                std::cout << "Test\n";
+                break;
+
+            case 5://Reset
                 ResetPossition();
                 break;
-            case 5://Create
+            case 6://Create
                 ResetPossition();
                 ConvertToFile();
                 break;
-            case 6://Load
+            case 7://Load
                 LoadFile();
                 menu = -1;
                 break;
@@ -146,9 +147,12 @@ void LevelEditor::OnClick(SDL_Event event) {
         Pleace(event);
 
     }
-    if (!clicked && clickBuffer == 0) {
-        MouseCollisonObjects(event, objects);
+    if (menu == -1) {
+        if (!clicked && clickBuffer == 0) {
+            MouseCollisonObjects(event, objects);
+        }
     }
+
     Settings(event);
     Move(event);
     ChangeScales(event);
@@ -422,7 +426,7 @@ void LevelEditor::Render() {
         break;
         }
     }
-    for (size_t i = 0; i < 7; i++)
+    for (size_t i = 0; i < 8; i++)
     {
         ui->RenderSingleButton(i, 1);
     }
