@@ -114,16 +114,46 @@ SDL_Rect* Pirate::ChooseAnimation() {
 	}
 }
 
+
+void Charger::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
+	if (colision[0]) {
+		movementtype = 2;
+		animation = 1;
+	}
+	else if(colision[2])
+	{
+		movementtype = 1;
+		animation = 2;
+	}
+	else if (colision[0] == true && colision[2] == true) {
+		movementtype = 0;
+	}
+	
+
+	switch (movementtype)
+	{
+		case 1:
+			GetRectangle()->x--;
+			break;
+
+		case 2:
+			GetRectangle()->x++;
+			break;
+
+	}
+	
+}
+
 void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
 	if (cProj == nullptr) {
 		switch (animation)
 		{
-			case 1:
-				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y, 1, 1, 30, 0);
-				break;
-			case 2:
-				cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y, 1, 1, -30, 0);
-				break;
+		case 1:
+			cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y, 1, 1, 30, 0);
+			break;
+		case 2:
+			cProj = new CollisonProjectile(GetRectangle()->x, GetRectangle()->y, 1, 1, -30, 0);
+			break;
 		}
 	}
 	else
@@ -191,37 +221,6 @@ void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager)
 		break;
 	}
 }
-
-
-void Charger::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
-	if (colision[0]) {
-		movementtype = 2;
-		animation = 1;
-	}
-	else if(colision[2])
-	{
-		movementtype = 1;
-		animation = 2;
-	}
-	else if (colision[0] == true && colision[2] == true) {
-		movementtype = 0;
-	}
-	
-
-	switch (movementtype)
-	{
-		case 1:
-			GetRectangle()->x--;
-			break;
-
-		case 2:
-			GetRectangle()->x++;
-			break;
-
-	}
-	
-}
-
 
 void Pirate::Movement(Player* player, Map* map, ParticlesManager* particleManager) {
 	if (isAggressive == false) {
@@ -323,6 +322,26 @@ void Pirate::Movement(Player* player, Map* map, ParticlesManager* particleManage
 
 	
 }
+
+
+void Charger::MakeAgressive() {}
+
+void Wolf::MakeAgressive() {
+	if (cProj != nullptr) {
+		cProj->SetTimer(50);
+	}
+	SoundManager::PlayWolfGrowlSound();
+	agroo = 300;
+}
+
+void Pirate::MakeAgressive() {
+	if (cProj != nullptr) {
+		cProj->SetTimer(50);
+	}
+	isAggressive = true;
+	agroo = 500;
+}
+
 //getters and setters
 SDL_Texture* Mobs::GetTextureCharger() {
     return textureCharger;

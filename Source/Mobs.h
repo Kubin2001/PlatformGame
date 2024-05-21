@@ -69,6 +69,8 @@ class Enemy {
 		virtual SDL_Rect* ChooseAnimation() = 0;
 
 		virtual void Movement(Player* player, Map* map, ParticlesManager* particleManager) = 0;
+
+		virtual void MakeAgressive() = 0;
 };
 
 class Charger : public Enemy{
@@ -80,6 +82,8 @@ class Charger : public Enemy{
 		}
 
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		void MakeAgressive()override;
 
 		SDL_Rect* ChooseAnimation()override;
 		~Charger() {
@@ -102,6 +106,8 @@ public:
 	void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
 
 	SDL_Rect* ChooseAnimation()override;
+
+	void MakeAgressive()override;
 
 	~Wolf() {
 		delete cProj;
@@ -127,6 +133,8 @@ class Pirate : public Enemy {
 		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
 
 		SDL_Rect* ChooseAnimation()override;
+
+		void MakeAgressive()override;
 
 		~Pirate() {
 			delete cProj;

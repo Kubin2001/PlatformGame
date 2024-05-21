@@ -12,37 +12,53 @@ extern int windowtype;
 extern int localWindow;
 extern std::string levelName;
 
-Map::Map(SDL_Renderer *renderer) {
+Map::Map(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 }
 //getters and setters
-SDL_Texture* Map::GetTextureFloor() {return textureFloor;}
+SDL_Texture* Map::GetTextureFloor() { return textureFloor; }
 
-void Map::SetTextureFloor(SDL_Texture* temptex) {textureFloor = temptex;}
+void Map::SetTextureFloor(SDL_Texture* temptex) { textureFloor = temptex; }
 
-SDL_Texture* Map::GetTexturePLatform() {return texturePlatform;}
+SDL_Texture* Map::GetTexturePLatform() { return texturePlatform; }
 
-void Map::SetTexturePlatform(SDL_Texture* temptex) {texturePlatform = temptex;}
+void Map::SetTexturePlatform(SDL_Texture* temptex) { texturePlatform = temptex; }
 
 SDL_Texture* Map::GetTexturePLatform2() { return texturePlatform2; }
 
 void Map::SetTexturePlatform2(SDL_Texture* temptex) { texturePlatform2 = temptex; }
 
-SDL_Texture* Map::GetTexturePilar() {return texturePillar;}
+SDL_Texture* Map::GetTexturePilar() { return texturePillar; }
 
-void Map::SetTexturePilar(SDL_Texture* temptex) {texturePillar = temptex;}
+void Map::SetTexturePilar(SDL_Texture* temptex) { texturePillar = temptex; }
 
 SDL_Texture* Map::GetTexturePilar2() { return texturePillar; }
 
 void Map::SetTexturePilar2(SDL_Texture* temptex) { texturePillar2 = temptex; }
 
-SDL_Texture* Map::GetTextureFlag() {return textureFlag;}
+SDL_Texture* Map::GetTextureFlag() { return textureFlag; }
 
-void Map::SetTextureFlag(SDL_Texture* temptex) {textureFlag = temptex;}
+void Map::SetTextureFlag(SDL_Texture* temptex) { textureFlag = temptex; }
 
 SDL_Texture* Map::GetTextureLava() { return textureFlag; }
 
 void Map::SetTextureLava(SDL_Texture* temptex) { textureLava = temptex; }
+
+SDL_Texture* Map::GetTexturePalmTree() { return texturePalmTree; }
+
+void Map::SetTexturePalmTree(SDL_Texture* temptex) { texturePalmTree = temptex; }
+
+SDL_Texture* Map::GetTextureCactus() { return textureCactus; }
+
+void Map::SetTextureCactus(SDL_Texture* temptex) { textureCactus = temptex; }
+
+SDL_Texture* Map::GetTextureBoulder() { return textureBoulder; }
+
+void Map::SetTextureBoulder(SDL_Texture* temptex) { textureBoulder = temptex; }
+
+SDL_Texture* Map::GetTextureBarrel() { return textureBarrel; }
+
+void Map::SetTextureBarrel(SDL_Texture* temptex) { textureBarrel = temptex; }
 
 
 
@@ -51,6 +67,7 @@ void Map::SetTextureLava(SDL_Texture* temptex) { textureLava = temptex; }
 
 void Map::CreateLevel() {
 	MapObject mapObject;
+	Decoration decoration;
 	Flag flag;
 	InvWall invWall;
 	Lava lava;
@@ -118,6 +135,29 @@ void Map::CreateLevel() {
 				getline(levelFile, line);
 				Lavas[Lavas.size() - 1].GetRectangle()->h = std::stoi(line);
 			}
+			else if (line == "palmTree" || line == "cactus" || line == "boulder" || line == "barrel") {
+				Decorations.push_back(decoration);
+				if (line == "palmTree") {
+					Decorations[Decorations.size() - 1].SetTexture(texturePalmTree);
+				}
+				else if (line == "cactus") {
+					Decorations[Decorations.size() - 1].SetTexture(textureCactus);
+				}
+				else if (line == "boulder") {
+					Decorations[Decorations.size() - 1].SetTexture(textureBoulder);
+				}
+				else if (line == "barrel") {
+					Decorations[Decorations.size() - 1].SetTexture(textureBarrel);
+				}
+				getline(levelFile, line);
+				Decorations[Decorations.size() - 1].GetRectangle()->x = std::stoi(line);
+				getline(levelFile, line);
+				Decorations[Decorations.size() - 1].GetRectangle()->y = std::stoi(line);
+				getline(levelFile, line);
+				Decorations[Decorations.size() - 1].GetRectangle()->w = std::stoi(line);
+				getline(levelFile, line);
+				Decorations[Decorations.size() - 1].GetRectangle()->h = std::stoi(line);
+			}
 		}
 	}
 	else
@@ -126,7 +166,7 @@ void Map::CreateLevel() {
 	}
 }
 
-void Map::DetectColison(Player* player,UI *ui,Camera *camera) {
+void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
 	for (int i = 0; i < MapObjects.size(); i++)
 	{
 		if (SimpleCollision(*camera->GetRectangle(), *MapObjects[i].GetRectangle())) {
@@ -156,6 +196,17 @@ void Map::DetectColison(Player* player,UI *ui,Camera *camera) {
 		else
 		{
 			Lavas[i].SetRenderable(false);
+		}
+	}
+
+	for (int i = 0; i < Decorations.size(); i++)
+	{
+		if (SimpleCollision(*camera->GetRectangle(), *Decorations[i].GetRectangle())) {
+			Decorations[i].SetRenderable(true);
+		}
+		else
+		{
+			Decorations[i].SetRenderable(false);
 		}
 	}
 
@@ -192,18 +243,32 @@ void Map::DetectColison(Player* player,UI *ui,Camera *camera) {
 
 	for (int i = 0; i < Lavas.size(); i++)
 	{
-		if (SimpleCollision(*player->GetRectangle(), *Lavas[i].GetRectangle())){
+		if (SimpleCollision(*player->GetRectangle(), *Lavas[i].GetRectangle())) {
 			player->SetDamage(true);
-			player->GetRectangle()->y -=3;
+			player->GetRectangle()->y -= 3;
 		}
 	}
 
 }
 
-void Map::MoveMap(const Uint8* state,Player *player) {
+void Map::MoveMap(const Uint8* state, Player* player) {
 
 }
 
+void Map::RenderDecorations(SDL_Rect camRect) {
+	SDL_Rect temp;
+	for (int i = 0; i < Decorations.size(); i++)
+	{
+		if (Decorations[i].GetRenderable()) {
+			temp.x = Decorations[i].GetRectangle()->x - camRect.x;
+			temp.y = Decorations[i].GetRectangle()->y - camRect.y;
+			temp.w = Decorations[i].GetRectangle()->w;
+			temp.h = Decorations[i].GetRectangle()->h;
+
+			SDL_RenderCopy(renderer, Decorations[i].GetTexture(), NULL, &temp);
+		}
+	}
+}
 
 void Map::RenderObjects(SDL_Rect camRect) {
 	SDL_Rect temp;
@@ -252,6 +317,7 @@ void Map::RenderLava(SDL_Rect camRect) {
 }
 
 void Map::Render(SDL_Rect camRect) {
+	RenderDecorations(camRect);
 	RenderObjects(camRect);
 	RenderFlag(camRect);
 	RenderLava(camRect);
@@ -260,14 +326,18 @@ void Map::Render(SDL_Rect camRect) {
 	//}
 }
 
-SDL_Rect* Object::GetRectangle() { return &rectangle;}
+SDL_Rect* Object::GetRectangle() { return &rectangle; }
 
-bool Object::GetRenderable() { return renderable;}
+bool Object::GetRenderable() { return renderable; }
 
-void Object::SetRenderable(bool temp) { renderable = temp;}
+void Object::SetRenderable(bool temp) { renderable = temp; }
 
 std::vector<MapObject>& Map::getMapObjects() {
 	return MapObjects;
+}
+
+std::vector<Decoration>& Map::getDecorations() {
+	return Decorations;
 }
 
 std::vector<Flag>& Map::getFlag() {
@@ -278,8 +348,6 @@ std::vector<InvWall>& Map::getInvWalls() {
 	return InvWalls;
 }
 
-
-
 std::vector<Lava>& Map::getLavas() {
 	return Lavas;
 }
@@ -288,10 +356,14 @@ SDL_Texture* MapObject::GetTexture() { return texture; }
 
 void MapObject::SetTexture(SDL_Texture* temptex) { texture = temptex; }
 
+
+SDL_Texture* Decoration::GetTexture() { return texture; }
+
+void Decoration::SetTexture(SDL_Texture* temptex) { texture = temptex; }
+
 SDL_Texture* Lava::GetTexture() { return texture; }
 
 void Lava::SetTexture(SDL_Texture* temptex) { texture = temptex; }
-
 
 Map::~Map() {
 	SDL_DestroyTexture(textureFloor);

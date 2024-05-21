@@ -118,6 +118,8 @@ void ParticlesManager::CheckColisionMobs(Mobs* mobs,SDL_Rect camRect) {
                 if (SimpleCollision(*PlayerAttackParticles[i].GetRectangle(), *mobs->getEnemies()[j]->GetRectangle())) {
                     mobs->getEnemies()[j]->setHitPoints(mobs->getEnemies()[j]->getHitPoints() - 10);
                     mobs->getEnemies()[j]->setInvTime(20);
+                    mobs->getEnemies()[j]->MakeAgressive();
+                    PlayerAttackParticles[i].SetLifeTime(0);
                     if (mobs->getEnemies()[j]->getHitPoints() < 1) {
                         mobs->getEnemies().erase(mobs->getEnemies().begin() + j);
                     }

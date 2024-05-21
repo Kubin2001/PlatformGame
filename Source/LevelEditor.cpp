@@ -55,9 +55,11 @@ void LevelEditor::LoadTextures() {
     std::string terrain = "Textures/Terrain";
     std::string mobs = "Textures/MobsEditor";
     std::string equipment = "Textures/Equipment";
+    std::string decorations = "Textures/Decorations";
     LoadHelper(mapObjects, terrain, renderer);
     LoadHelper(mobsObjects, mobs, renderer);
     LoadHelper(equipmentObjects, equipment, renderer);
+    LoadHelper(decorationsObjects, decorations, renderer);
 
     texturePlayer = load("Textures/playerEditor.png", renderer);
 
@@ -111,9 +113,19 @@ void LevelEditor::OnClick(SDL_Event event) {
                 }
                 break;
             case 3://Decorations
-                std::cout << "Test\n";
+                for (int i = 0; i < decorationsObjects.size(); i++)
+                {
+                    rectangles.push_back(rect);
+                    rectangles[rectangles.size() - 1].x = posX;
+                    rectangles[rectangles.size() - 1].y = posY;
+                    rectangles[rectangles.size() - 1].w = 70;
+                    rectangles[rectangles.size() - 1].h = 70;
+                    posX += 80;
+                }
                 break;
-
+            case 4://Close
+                menu = -1;
+                break;
             case 5://Reset
                 ResetPossition();
                 break;
@@ -137,6 +149,9 @@ void LevelEditor::OnClick(SDL_Event event) {
                     break;
                 case 2:
                     MouseCollison(event, equipmentObjects);
+                    break;
+                case 3:
+                    MouseCollison(event, decorationsObjects);
                     break;
             }
         }
@@ -424,6 +439,11 @@ void LevelEditor::Render() {
                 SDL_RenderCopy(renderer, equipmentObjects[i].text, NULL, &rectangles[i]);
             }
         break;
+        case 3:
+            for (int i = 0; i < decorationsObjects.size(); i++) {
+                SDL_RenderCopy(renderer, decorationsObjects[i].text, NULL, &rectangles[i]);
+            }
+            break;
         }
     }
     for (size_t i = 0; i < 8; i++)

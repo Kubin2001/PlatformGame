@@ -33,6 +33,17 @@ class MapObject : public Object {
 };
 
 
+class Decoration : public Object {
+	private:
+		SDL_Texture* texture;
+
+	public:
+		SDL_Texture* GetTexture();
+
+		void SetTexture(SDL_Texture* temptex);
+};
+
+
 class Lava : public Object {
 	private:
 		SDL_Texture* texture;
@@ -62,6 +73,7 @@ class Map {
 		SDL_Renderer* renderer = nullptr;
 
 		std::vector<MapObject> MapObjects;
+		std::vector<Decoration> Decorations;
 		std::vector<Flag> Flags;
 		std::vector<InvWall> InvWalls;
 
@@ -74,6 +86,11 @@ class Map {
 		SDL_Texture* textureFlag = nullptr;
 		SDL_Texture* textureFloor = nullptr;
 		SDL_Texture* textureLava = nullptr;
+
+		SDL_Texture* texturePalmTree = nullptr;
+		SDL_Texture* textureCactus = nullptr;
+		SDL_Texture* textureBoulder = nullptr;
+		SDL_Texture* textureBarrel = nullptr;
 	
 	public:
 		//SDL_Texture* textureInvWall = nullptr;
@@ -109,6 +126,22 @@ class Map {
 
 		void SetTextureLava(SDL_Texture* temptex);
 
+		SDL_Texture* GetTexturePalmTree();
+
+		void SetTexturePalmTree(SDL_Texture* temptex);
+
+		SDL_Texture* GetTextureCactus();
+
+		void SetTextureCactus(SDL_Texture* temptex);
+
+		SDL_Texture* GetTextureBoulder();
+
+		void SetTextureBoulder(SDL_Texture* temptex);
+
+		SDL_Texture* GetTextureBarrel();
+
+		void SetTextureBarrel(SDL_Texture* temptex);
+
 		//getters and setters
 
 		void Render(SDL_Rect camRect);
@@ -119,6 +152,8 @@ class Map {
 
 		void CreateLevel();
 
+		void RenderDecorations(SDL_Rect camRect);
+
 		void RenderObjects(SDL_Rect camRect);
 
 		void RenderFlag(SDL_Rect camRect);
@@ -126,6 +161,8 @@ class Map {
 		void RenderLava(SDL_Rect camRect);
 
 		std::vector<MapObject> &getMapObjects();
+
+		std::vector<Decoration>& getDecorations();
 
 		std::vector<Flag> &getFlag();
 

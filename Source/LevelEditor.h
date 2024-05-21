@@ -20,6 +20,7 @@ class LevelEditor
         std::vector<PleacedObject> mapObjects;
         std::vector<PleacedObject> mobsObjects;
         std::vector<PleacedObject> equipmentObjects;
+        std::vector<PleacedObject> decorationsObjects;
         PleacedObject mouseObject;
         SDL_Texture* texturePlayer;
         SDL_Rect rectanglePlayer{ 700,400,46,104};

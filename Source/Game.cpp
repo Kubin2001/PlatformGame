@@ -87,6 +87,10 @@ void Game::LoadTextures() {
         map->SetTexturePilar(load("Textures/Terrain/pillar.png", renderer));
         map->SetTexturePilar2(load("Textures/Terrain/pillar2.png", renderer));
         map->SetTextureLava(load("Textures/Terrain/lava.png", renderer));
+        map->SetTexturePalmTree(load("Textures/Decorations/palmTree.png", renderer));
+        map->SetTextureCactus(load("Textures/Decorations/cactus.png", renderer));
+        map->SetTextureBoulder(load("Textures/Decorations/boulder.png", renderer));
+        map->SetTextureBarrel(load("Textures/Decorations/barrel.png", renderer));
         //map->textureInvWall = load("Textures/Terrain/invWall.png", renderer);
         map->SetTextureFlag(load("Textures/Terrain/flag.png", renderer));
         mobs->SetTextureCharger(load("Textures/Mobs/charger.png", renderer));
@@ -194,8 +198,8 @@ void Game::Render() {
         ui->Render();
         break;
     case 2:
-        player->Render(*camera->GetRectangle());
         map->Render(*camera->GetRectangle());
+        player->Render(*camera->GetRectangle());
         mobs->Render(*camera->GetRectangle());
         ui->Render();
         equipment->Render(*camera->GetRectangle());
