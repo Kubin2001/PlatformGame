@@ -13,6 +13,7 @@ class SoundManager
         static Mix_Chunk* soundAttack;
         static Mix_Chunk* soundHurt;
         static Mix_Chunk* soundLose;
+        static Mix_Chunk* soundWin;
         //Player
         //Mobs
         static Mix_Chunk* soundGrowl;
@@ -37,6 +38,8 @@ class SoundManager
         static void PlayPlayerHurtSound();
 
         static void PlayPlayerLoseSound();
+
+        static void PlayPlayerWinSound();
 
         static void PlayEnemyDeathSound();
 

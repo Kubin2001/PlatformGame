@@ -7,6 +7,7 @@
 #include "Colision.h"
 #include "UI.h"
 #include "Camera.h"
+#include "SoundManager.h"
 
 extern int windowtype;
 extern int localWindow;
@@ -234,6 +235,7 @@ void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
 		switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
 		{
 		case 3:
+			SoundManager::PlayPlayerWinSound();
 			ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
 			SDL_Delay(4000);
 			localWindow = 1;
@@ -317,7 +319,6 @@ void Map::RenderLava(SDL_Rect camRect) {
 }
 
 void Map::Render(SDL_Rect camRect) {
-	RenderDecorations(camRect);
 	RenderObjects(camRect);
 	RenderFlag(camRect);
 	RenderLava(camRect);

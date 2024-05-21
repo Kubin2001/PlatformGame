@@ -9,6 +9,9 @@ Mix_Chunk* SoundManager::soundJump = nullptr;
 Mix_Chunk* SoundManager::soundAttack = nullptr;
 Mix_Chunk* SoundManager::soundHurt = nullptr;
 Mix_Chunk* SoundManager::soundLose = nullptr;
+Mix_Chunk* SoundManager::soundWin = nullptr;
+
+
 Mix_Chunk* SoundManager::soundGrowl = nullptr;
 Mix_Chunk* SoundManager::soundDeath = nullptr;
 Mix_Chunk* SoundManager::soundPirateAttack = nullptr;
@@ -26,6 +29,7 @@ void SoundManager::LoadGame() {
 	soundAttack = Mix_LoadWAV("Sounds/Player/attack.wav");
 	soundHurt = Mix_LoadWAV("Sounds/Player/hurt.wav");
 	soundLose = Mix_LoadWAV("Sounds/Player/lose.wav");
+	soundWin = Mix_LoadWAV("Sounds/Player/win.wav");
 	//Player
 	//Mobs
 	soundGrowl = Mix_LoadWAV("Sounds/Mobs/wolfGrowl.wav");
@@ -53,6 +57,11 @@ void SoundManager::PlayPlayerHurtSound() {
 
 void SoundManager::PlayPlayerLoseSound() {
 	Mix_PlayChannel(-1, soundLose, 0);
+}
+
+
+void SoundManager::PlayPlayerWinSound() {
+	Mix_PlayChannel(-1, soundWin, 0);
 }
 
 
@@ -87,6 +96,8 @@ void SoundManager::UnLoadGame() {
 	soundLose = nullptr;
 	Mix_FreeChunk(soundPirateAttack);
 	soundPirateAttack = nullptr;
+	Mix_FreeChunk(soundWin);
+	soundWin = nullptr;
 }
 
 void SoundManager::UnLoadEditor() {

@@ -38,8 +38,6 @@ void UI::Render() {
         {
             int size = Buttons[i].GetRectangle()->w / Buttons[i].GetText().length() - 2;
             font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, size, size, size + 2);
-                    
-
         }
     }
     else if (windowtype == 2) {
@@ -98,19 +96,8 @@ void UI::CreateButton() {
             yPos = 200;
             for (int i = 0; i < 4; i++)
             {
-                Buttons.push_back(button);
-                Buttons[i].GetRectangle()->x = xPos;
-                Buttons[i].GetRectangle()->y = yPos;
-                Buttons[i].GetRectangle()->w = 200;
-                Buttons[i].GetRectangle()->h = 50;
-                if (std::getline(levelFile, line)) {
-                    Buttons[i].SetText(line);
-                }
-                else
-                {
-                    Buttons[i].SetText(" ");
-                }
-
+                std::getline(levelFile, line);
+                CreateSingleButton(xPos, yPos, 200, 50, line, 29, 30);
                 yPos += 150;
             }
         }
@@ -122,19 +109,8 @@ void UI::CreateButton() {
             yPos = 200;
             for (int i = 0; i < 11; i++)
             {
-                Buttons.push_back(button);
-                Buttons[i].GetRectangle()->x = xPos;
-                Buttons[i].GetRectangle()->y = yPos;
-                Buttons[i].GetRectangle()->w = 200;
-                Buttons[i].GetRectangle()->h = 100;
-                if (std::getline(levelFile, line)) {
-                    Buttons[i].SetText(line);
-                }
-                else
-                {
-                    Buttons[i].SetText(" ");
-                }
-
+                std::getline(levelFile, line);
+                CreateSingleButton(xPos, yPos, 200, 100, line, 29, 30);
                 xPos += 250;
                 if (i == 4) {
                     xPos = 100;
@@ -155,19 +131,8 @@ void UI::CreateButton() {
             yPos = 200;
             for (int i = 0; i < 11; i++)
             {
-                Buttons.push_back(button);
-                Buttons[i].GetRectangle()->x = xPos;
-                Buttons[i].GetRectangle()->y = yPos;
-                Buttons[i].GetRectangle()->w = 200;
-                Buttons[i].GetRectangle()->h = 100;
-                if (std::getline(levelFile, line)) {
-                    Buttons[i].SetText(line);
-                }
-                else
-                {
-                    Buttons[i].SetText(" ");
-                }
-
+                std::getline(levelFile, line);
+                CreateSingleButton(xPos, yPos, 200, 100, line, 29, 30);
                 xPos += 250;
                 if (i == 4) {
                     xPos = 100;
@@ -180,37 +145,7 @@ void UI::CreateButton() {
 
             }
         }
-              break;
-        case 3: { //Level Editor
-            std::ifstream levelFile("Data/menu_editor.txt");
-            std::string line;
-            xPos = 300;
-            yPos = 200;
-            for (int i = 0; i < 3; i++)
-            {
-                Buttons.push_back(button);
-                Buttons[i].GetRectangle()->x = xPos;
-                Buttons[i].GetRectangle()->y = yPos;
-                Buttons[i].GetRectangle()->w = 200;
-                Buttons[i].GetRectangle()->h = 100;
-                if (std::getline(levelFile, line)) {
-                    Buttons[i].SetText(line);
-                }
-                else
-                {
-                    Buttons[i].SetText(" ");
-                }
-
-                xPos += 600;
-
-                if (i == 1) {
-                    xPos = 600;
-                    yPos = 400;
-                }
-
-            }
-        }
-              break;
+           break;
     }
 }
 
@@ -278,9 +213,8 @@ void UI::OnClick(SDL_Event event) {
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[3].GetRectangle()) == 1) {
-                    menuType = 3;
+                    localWindow = 3;
                     Buttons.clear();
-                    CreateButton();
                 }
                 break;
             case 1:
@@ -325,17 +259,6 @@ void UI::OnClick(SDL_Event event) {
                     menuType = 0;
                     Buttons.clear();
                     CreateButton();
-                }
-                break;
-            case 3:
-                if (SimpleCollision(mouse, *Buttons[2].GetRectangle()) == 1) {
-                    menuType = 0;
-                    Buttons.clear();
-                    CreateButton();
-                }
-                if (SimpleCollision(mouse, *Buttons[0].GetRectangle()) == 1) {
-                    localWindow = 3;
-                    Buttons.clear();
                 }
                 break;
         }

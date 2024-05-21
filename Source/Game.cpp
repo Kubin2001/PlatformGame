@@ -198,8 +198,9 @@ void Game::Render() {
         ui->Render();
         break;
     case 2:
-        map->Render(*camera->GetRectangle());
+        map->RenderDecorations(*camera->GetRectangle());
         player->Render(*camera->GetRectangle());
+        map->Render(*camera->GetRectangle());
         mobs->Render(*camera->GetRectangle());
         ui->Render();
         equipment->Render(*camera->GetRectangle());
