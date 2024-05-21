@@ -506,6 +506,14 @@ void LevelEditor::LoadFile() {
                     }
                 }
 
+                for (int i = 0; i < decorationsObjects.size(); i++)
+                {
+                    if (line == decorationsObjects[i].name) {
+                        objects[objects.size() - 1].text = decorationsObjects[i].text;
+                        break;
+                    }
+                }
+
                 objects[objects.size() - 1].name = line;
                 getline(levelFile, line);
                 objects[objects.size() - 1].rect.x = std::stoi(line);
