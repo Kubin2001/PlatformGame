@@ -20,7 +20,9 @@ class SoundManager
         static Mix_Chunk* soundDeath;
         static Mix_Chunk* soundPirateAttack;
         //Mobs
-
+        //Collectables
+        static Mix_Chunk* soundCoin;
+        //Collectables
 
     public:
         SoundManager();
@@ -46,6 +48,8 @@ class SoundManager
         static void PlayWolfGrowlSound();
 
         static void PlayPirateAttackSound();
+
+        static void PlayCoinSound();
 
         static void UnLoadMenu();
 

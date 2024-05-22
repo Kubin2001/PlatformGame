@@ -172,6 +172,21 @@ void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
 	{
 		if (SimpleCollision(*camera->GetRectangle(), *MapObjects[i].GetRectangle())) {
 			MapObjects[i].SetRenderable(true);
+			switch (Collision(*player->GetRectangle(), *MapObjects[i].GetRectangle()))
+			{
+			case 1:
+				player->setColison(true, 0);
+				break;
+			case 2:
+				player->setColison(true, 1);
+				break;
+			case 3:
+				player->setColison(true, 2);
+				break;
+			case 4:
+				player->setColison(true, 3);
+				break;
+			}
 		}
 		else
 		{
@@ -182,6 +197,15 @@ void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
 	{
 		if (SimpleCollision(*camera->GetRectangle(), *Flags[i].GetRectangle())) {
 			Flags[i].SetRenderable(true);
+			switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
+			{
+			case 3:
+				SoundManager::PlayPlayerWinSound();
+				ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
+				SDL_Delay(4000);
+				localWindow = 1;
+				break;
+			}
 		}
 		else
 		{
@@ -193,6 +217,10 @@ void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
 	{
 		if (SimpleCollision(*camera->GetRectangle(), *Lavas[i].GetRectangle())) {
 			Lavas[i].SetRenderable(true);
+			if (SimpleCollision(*player->GetRectangle(), *Lavas[i].GetRectangle())) {
+				player->SetDamage(true);
+				player->GetRectangle()->y -= 3;
+			}
 		}
 		else
 		{
@@ -210,47 +238,6 @@ void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
 			Decorations[i].SetRenderable(false);
 		}
 	}
-
-	for (int i = 0; i < MapObjects.size(); i++)
-	{
-		switch (Collision(*player->GetRectangle(), *MapObjects[i].GetRectangle()))
-		{
-		case 1:
-			player->setColison(true, 0);
-			break;
-		case 2:
-			player->setColison(true, 1);
-			break;
-		case 3:
-			player->setColison(true, 2);
-			break;
-		case 4:
-			player->setColison(true, 3);
-			break;
-		}
-	}
-
-	for (int i = 0; i < Flags.size(); i++)
-	{
-		switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
-		{
-		case 3:
-			SoundManager::PlayPlayerWinSound();
-			ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
-			SDL_Delay(4000);
-			localWindow = 1;
-			break;
-		}
-	}
-
-	for (int i = 0; i < Lavas.size(); i++)
-	{
-		if (SimpleCollision(*player->GetRectangle(), *Lavas[i].GetRectangle())) {
-			player->SetDamage(true);
-			player->GetRectangle()->y -= 3;
-		}
-	}
-
 }
 
 void Map::MoveMap(const Uint8* state, Player* player) {

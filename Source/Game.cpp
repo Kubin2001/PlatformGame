@@ -21,7 +21,7 @@ Game::Game() {
     map = nullptr;
     mobs = nullptr;
     ui = nullptr;
-    equipment = nullptr;
+    collectables = nullptr;
     levelEditor = nullptr;
     particlesManager = nullptr;
 }
@@ -51,14 +51,14 @@ void Game::Start() {
             map = new Map(renderer);
             mobs = new Mobs(renderer);
             player = new Player(renderer);
-            equipment = new Equipment(renderer);
+            collectables = new Collectables(renderer);
             particlesManager = new ParticlesManager(renderer);
             LoadTextures();
             player->LoadAnimations(48);
             map->CreateLevel();
             mobs->LoadMobs();
             ui->CreateHearths();
-            equipment->LoadEquipment();
+            collectables->LoadEquipment();
             SoundManager::LoadGame();
             break;
         case 3:
@@ -98,7 +98,8 @@ void Game::LoadTextures() {
         mobs->SetTexturePirate(load("Textures/Mobs/pirate.png", renderer));
         ui->SetTextureHearth(load("Textures/Interface/hearth.png", renderer));
         ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
-        equipment->SetTextureShortSword(load("Textures/Equipment/shortSword.png", renderer));
+        collectables->SetTextureShortSword(load("Textures/Collectables/shortSword.png", renderer));
+        collectables->SetTextureCoin(load("Textures/Collectables/coin.png", renderer));
         ui->SetTextureButtonInfo(load("Textures/Interface/buttonInfo.png", renderer));
         break;
     case 3:
@@ -134,6 +135,10 @@ void Game::Events() {
         case 1:
             break;
         case 2:
+            framesCounter++;
+            if (framesCounter % 60 == 0 && ui->GetScore() > 0) {
+                ui->SetScore(ui->GetScore() - 1);
+            }
             player->setColison(false, 0);
             player->setColison(false, 1);
             player->setColison(false, 2);
@@ -143,7 +148,7 @@ void Game::Events() {
             mobs->DetectColison(player, map,*camera->GetRectangle());
             particlesManager->CheckColision(mobs,player,*camera->GetRectangle());
             particlesManager->EndLifeTime();
-            equipment->DetectCollison(player,*camera->GetRectangle());
+            collectables->DetectCollison(ui,player,*camera->GetRectangle());
             player->UpdateWeapon();
             break;
         case 3:
@@ -180,7 +185,6 @@ void Game::Movement() {
         player->Attack(state,particlesManager);
         map->MoveMap(state, player);
         mobs->MoveMobs(state, player,map,particlesManager);
-        equipment->MoveEquipment(state, player);
         particlesManager->MoveParticles(state,player);
         break;
     case 3:
@@ -203,7 +207,7 @@ void Game::Render() {
         map->Render(*camera->GetRectangle());
         mobs->Render(*camera->GetRectangle());
         ui->Render();
-        equipment->Render(*camera->GetRectangle());
+        collectables->Render(*camera->GetRectangle());
         particlesManager->Render(*camera->GetRectangle());
         break;
     case 3:
@@ -219,12 +223,13 @@ void Game::Clear() {
         delete ui;
         break;
     case 2:
+        framesCounter = 0;
         delete camera;
         delete ui;
         delete player;
         delete map;
         delete mobs;
-        delete equipment;
+        delete collectables;
         delete particlesManager;
         SoundManager::UnLoadGame();
         break;

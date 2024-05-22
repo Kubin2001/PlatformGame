@@ -16,6 +16,9 @@ Mix_Chunk* SoundManager::soundGrowl = nullptr;
 Mix_Chunk* SoundManager::soundDeath = nullptr;
 Mix_Chunk* SoundManager::soundPirateAttack = nullptr;
 
+
+Mix_Chunk* SoundManager::soundCoin = nullptr;
+
 SoundManager::SoundManager() {
 }
 
@@ -36,6 +39,9 @@ void SoundManager::LoadGame() {
 	soundDeath = Mix_LoadWAV("Sounds/Mobs/mobDeath.wav");
 	soundPirateAttack = Mix_LoadWAV("Sounds/Mobs/pirateAttack.wav");
 	//Mobs
+	//Collectables
+	soundCoin = Mix_LoadWAV("Sounds/Collectables/coin.wav");
+	//Collectables
 }
 
 void SoundManager::LoadEditor() {
@@ -75,6 +81,10 @@ void SoundManager::PlayWolfGrowlSound() {
 
 void SoundManager::PlayPirateAttackSound() {
 	Mix_PlayChannel(-1, soundPirateAttack, 0);
+}
+
+void SoundManager::PlayCoinSound() {
+	Mix_PlayChannel(-1, soundCoin, 0);
 }
 
 void SoundManager::UnLoadMenu() {

@@ -55,6 +55,7 @@ class UI
         std::vector<Button> Buttons;
         ButtonInfo* buttonInfo;
         int menuType = 0;
+        int score = 0;
 
     public:
         Font* font;
@@ -67,6 +68,8 @@ class UI
         void SetTextureButton(SDL_Texture* temptex);
         SDL_Texture* GetTextureButtonInfo();
         void SetTextureButtonInfo(SDL_Texture* temptex);
+        int GetScore();
+        void SetScore(int temp);
 
         std::vector<Hearth> &getHP();
         void CreateHearths();
@@ -80,6 +83,7 @@ class UI
 
         void Render();
         void RenderHP();
+        void RenderScore();
         void RenderButton();
 
         void RenderSingleButton(int index, int textureType);

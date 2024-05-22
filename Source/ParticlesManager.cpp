@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL.h>
 #include "ParticlesManager.h"
+#include "SoundManager.h"
 
 ParticlesManager::ParticlesManager(SDL_Renderer * renderer) {
     this->renderer = renderer;
@@ -121,6 +122,7 @@ void ParticlesManager::CheckColisionMobs(Mobs* mobs,SDL_Rect camRect) {
                     mobs->getEnemies()[j]->MakeAgressive();
                     PlayerAttackParticles[i].SetLifeTime(0);
                     if (mobs->getEnemies()[j]->getHitPoints() < 1) {
+                        SoundManager::PlayEnemyDeathSound();
                         mobs->getEnemies().erase(mobs->getEnemies().begin() + j);
                     }
                 }

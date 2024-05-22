@@ -31,6 +31,13 @@ void UI::SetTextureButtonInfo(SDL_Texture* temptex) {textureButtonInfo = temptex
 
 std::vector<Hearth>& UI::getHP() {return HP;}
 
+int UI::GetScore() {
+    return score;
+}
+void UI::SetScore(int temp) {
+    score = temp;
+}
+
 void UI::Render() {
     if (windowtype == 1) {
         RenderButton();
@@ -42,6 +49,7 @@ void UI::Render() {
     }
     else if (windowtype == 2) {
         RenderHP();
+        RenderScore();
     }
 
 }
@@ -50,6 +58,10 @@ void UI::RenderHP() {
     for (int i = 0; i < HP.size(); i++) {
         SDL_RenderCopy(renderer, texturehearth, NULL, HP[i].GetRectangle());
     }
+}
+
+void UI::RenderScore() {
+    font->RenderText(renderer,"SCORE:" + std::to_string(score), 1000, 50, 40, 40, 42);
 }
 
 void UI::RenderButton() {

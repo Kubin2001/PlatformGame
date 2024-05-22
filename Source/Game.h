@@ -4,7 +4,7 @@
 #include "Map.h"
 #include "Mobs.h"
 #include "UI.h"
-#include "Equipment.h"
+#include "Collectables.h"
 #include "LevelEditor.h"
 #include "ParticlesManager.h"
 #include "Camera.h"
@@ -19,7 +19,7 @@ private:
 	Map* map;
 	Mobs* mobs;
 	UI* ui;
-	Equipment* equipment;
+	Collectables* collectables;
 	ParticlesManager* particlesManager;
 	LevelEditor* levelEditor;
 	
@@ -27,6 +27,7 @@ private:
 	bool renderBack = true;
 	SDL_Rect rectback{0,0,1400,800};
 	SDL_Event event = {};
+	long long int framesCounter = 0;
 
 public:
 	Game();

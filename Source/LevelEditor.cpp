@@ -54,7 +54,7 @@ void LoadHelper(std::vector<PleacedObject>& vector, std::string directory, SDL_R
 void LevelEditor::LoadTextures() {
     std::string terrain = "Textures/Terrain";
     std::string mobs = "Textures/MobsEditor";
-    std::string equipment = "Textures/Equipment";
+    std::string equipment = "Textures/Collectables";
     std::string decorations = "Textures/Decorations";
     LoadHelper(mapObjects, terrain, renderer);
     LoadHelper(mobsObjects, mobs, renderer);
