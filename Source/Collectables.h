@@ -15,8 +15,10 @@ class Pickable {
         virtual SDL_Rect* GetRectangle();
         virtual bool GetRenderable();
         virtual void SetRenderable(bool temp);
-        SDL_Texture* GetTexture();
-        void SetTexture(SDL_Texture* temptex);
+        virtual SDL_Texture* GetTexture();
+        virtual void SetTexture(SDL_Texture* temptex);
+
+        virtual void Interaction(Player* player, UI* ui) = 0;
 };
 
 class Point : public Pickable {
@@ -24,6 +26,16 @@ class Point : public Pickable {
         int value = 10;
     public:
         Point() {}
+
+        void Interaction(Player * player, UI * ui)override;
+};
+
+class MedKit : public Pickable {
+    public:
+        MedKit() {}
+
+        void Interaction(Player* player, UI* ui)override;
+
 };
 
 
@@ -51,6 +63,7 @@ class Collectables
     private:
         SDL_Texture *textureShortSword = nullptr;
         SDL_Texture *textureCoin = nullptr;
+        SDL_Texture* textureMedKit = nullptr;
 
         SDL_Renderer *renderer = nullptr;
         std::vector<CollectableWeapon*> Weapons;
@@ -63,6 +76,9 @@ class Collectables
         void SetTextureShortSword(SDL_Texture* temptex);
         SDL_Texture* GetTextureCoin();
         void SetTextureCoin(SDL_Texture* temptex);
+        SDL_Texture* GetTextureMedKit();
+        void SetTextureMedKit(SDL_Texture* temptex);
+
 
         void LoadEquipment();
         void DetectCollison(UI* ui, Player* player, SDL_Rect camRect);

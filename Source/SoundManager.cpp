@@ -18,6 +18,7 @@ Mix_Chunk* SoundManager::soundPirateAttack = nullptr;
 
 
 Mix_Chunk* SoundManager::soundCoin = nullptr;
+Mix_Chunk* SoundManager::soundMedKit = nullptr;
 
 SoundManager::SoundManager() {
 }
@@ -41,6 +42,7 @@ void SoundManager::LoadGame() {
 	//Mobs
 	//Collectables
 	soundCoin = Mix_LoadWAV("Sounds/Collectables/coin.wav");
+	soundMedKit = Mix_LoadWAV("Sounds/Collectables/medKit.wav");
 	//Collectables
 }
 
@@ -85,6 +87,10 @@ void SoundManager::PlayPirateAttackSound() {
 
 void SoundManager::PlayCoinSound() {
 	Mix_PlayChannel(-1, soundCoin, 0);
+}
+
+void SoundManager::PlayMedKitSound() {
+	Mix_PlayChannel(-1, soundMedKit, 0);
 }
 
 void SoundManager::UnLoadMenu() {

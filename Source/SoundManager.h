@@ -22,6 +22,7 @@ class SoundManager
         //Mobs
         //Collectables
         static Mix_Chunk* soundCoin;
+        static Mix_Chunk* soundMedKit;
         //Collectables
 
     public:
@@ -50,6 +51,8 @@ class SoundManager
         static void PlayPirateAttackSound();
 
         static void PlayCoinSound();
+
+        static void PlayMedKitSound();
 
         static void UnLoadMenu();
 

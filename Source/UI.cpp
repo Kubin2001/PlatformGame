@@ -95,6 +95,17 @@ void UI::RemoveHearths() {
 
 }
 
+void UI::AddHearth() {
+    Hearth hearth;
+    if (HP.size() < 6) {
+        HP.push_back(hearth);
+        HP[HP.size() - 1].GetRectangle()->x = HP[HP.size() - 2].GetRectangle()->x + 50;
+        HP[HP.size() - 1].GetRectangle()->y = HP[HP.size() - 2].GetRectangle()->y;
+        HP[HP.size() - 1].GetRectangle()->w = HP[HP.size() - 2].GetRectangle()->w;
+        HP[HP.size() - 1].GetRectangle()->h = HP[HP.size() - 2].GetRectangle()->h;
+    }
+}
+
 void UI::CreateButton() {
     int xPos = 0;
     int yPos = 0;

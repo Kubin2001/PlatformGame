@@ -31,6 +31,14 @@ void Collectables::SetTextureCoin(SDL_Texture* temptex) {
 	textureCoin = temptex;
 }
 
+SDL_Texture* Collectables::GetTextureMedKit() {
+	return textureMedKit;
+}
+
+void Collectables::SetTextureMedKit(SDL_Texture* temptex) {
+	textureMedKit = temptex;
+}
+
 void Collectables::LoadEquipment() {
 	ShortSword tempShortSword;
 	std::ifstream levelFile(levelName);
@@ -51,7 +59,7 @@ void Collectables::LoadEquipment() {
 				Weapons[Weapons.size() - 1]->GetRectangle()->h = std::stoi(line);
 			}
 			else if (line == "coin") {
-				Pickables.push_back(new Pickable());
+				Pickables.push_back(new Point());
 				getline(levelFile, line);
 				Pickables[Pickables.size() - 1]->GetRectangle()->x = std::stoi(line);
 				getline(levelFile, line);
@@ -61,6 +69,18 @@ void Collectables::LoadEquipment() {
 				getline(levelFile, line);
 				Pickables[Pickables.size() - 1]->GetRectangle()->h = std::stoi(line);
 				Pickables[Pickables.size() - 1]->SetTexture(textureCoin);
+			}
+			else if (line == "medKit") {
+				Pickables.push_back(new MedKit());
+				getline(levelFile, line);
+				Pickables[Pickables.size() - 1]->GetRectangle()->x = std::stoi(line);
+				getline(levelFile, line);
+				Pickables[Pickables.size() - 1]->GetRectangle()->y = std::stoi(line);
+				getline(levelFile, line);
+				Pickables[Pickables.size() - 1]->GetRectangle()->w = std::stoi(line);
+				getline(levelFile, line);
+				Pickables[Pickables.size() - 1]->GetRectangle()->h = std::stoi(line);
+				Pickables[Pickables.size() - 1]->SetTexture(textureMedKit);
 			}
 		}
 	}
@@ -100,8 +120,7 @@ void Collectables::DetectCollison(UI * ui, Player* player,SDL_Rect camRect) {
 				case 0:
 					break;
 				case 1:
-					SoundManager::PlayCoinSound();
-					ui->SetScore(ui->GetScore() + 10);
+					Pickables[i]->Interaction(player,ui);
 					delete Pickables[i];
 					Pickables.erase(Pickables.begin() + i);
 					break;
@@ -171,6 +190,16 @@ SDL_Texture* Pickable::GetTexture() {
 
 void Pickable::SetTexture(SDL_Texture* temptex) {
 	texture = temptex;
+}
+
+void Point::Interaction(Player* player, UI* ui) {
+	SoundManager::PlayCoinSound();
+	ui->SetScore(ui->GetScore() + 10);
+}
+
+void MedKit::Interaction(Player* player, UI* ui) {
+	SoundManager::PlayMedKitSound();
+	ui->AddHearth();
 }
 
 Collectables::~Collectables() {

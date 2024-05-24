@@ -74,6 +74,7 @@ class UI
         std::vector<Hearth> &getHP();
         void CreateHearths();
         void RemoveHearths();
+        void AddHearth();
 
         void CreateButton();
 

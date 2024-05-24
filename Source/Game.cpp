@@ -100,6 +100,7 @@ void Game::LoadTextures() {
         ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
         collectables->SetTextureShortSword(load("Textures/Collectables/shortSword.png", renderer));
         collectables->SetTextureCoin(load("Textures/Collectables/coin.png", renderer));
+        collectables->SetTextureMedKit(load("Textures/Collectables/medKit.png", renderer));
         ui->SetTextureButtonInfo(load("Textures/Interface/buttonInfo.png", renderer));
         break;
     case 3:
