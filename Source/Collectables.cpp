@@ -3,40 +3,128 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <filesystem>
+
 #include "Collectables.h"
 #include "Player.h"
 #include "Colision.h"
 #include "SoundManager.h"
 #include "UI.h"
+#include "TextureManager.h"
 
 extern std::string levelName;
+extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
+
+//Top Objects
+
+SDL_Rect* CollectableWeapon::GetRectangle() {
+	return &rectangle;
+}
+
+bool CollectableWeapon::GetRenderable() { return renderable; }
+
+void CollectableWeapon::SetRenderable(bool temp) { renderable = temp; }
+
+SDL_Texture* CollectableWeapon::GetTexture() {
+	return texture;
+}
+
+void CollectableWeapon::SetTexture(SDL_Texture* temptex) {
+	texture = temptex;
+}
+
+
+SDL_Rect* Pickable::GetRectangle() {
+	return &rectangle;
+}
+
+bool Pickable::GetRenderable() { return renderable; }
+
+void Pickable::SetRenderable(bool temp) { renderable = temp; }
+
+SDL_Texture* Pickable::GetTexture() {
+	return texture;
+}
+
+void Pickable::SetTexture(SDL_Texture* temptex) {
+	texture = temptex;
+}
+
+bool Point::CollisionPlayer(Player* player, UI* ui) {
+	if (SimpleCollision(*player->GetRectangle(), *GetRectangle())) {
+		SoundManager::PlayCoinSound();
+		ui->SetScore(ui->GetScore() + 10);
+		return true;
+	}
+	return false;
+}
+
+bool MedKit::CollisionPlayer(Player* player, UI* ui) {
+	if (SimpleCollision(*player->GetRectangle(), *GetRectangle())) {
+		SoundManager::PlayMedKitSound();
+		ui->AddHearth();
+		return true;
+	}
+	return false;
+}
+
+//Main Objetct
 
 Collectables::Collectables(SDL_Renderer* renderer) {
     this->renderer = renderer;
 }
 
-SDL_Texture* Collectables::GetTextureShortSword() {
-    return textureShortSword;
+//Getters and setters
+std::vector<Texture>& Collectables::getTextures() {
+	return Textures;
+}
+//Getters and setters
+
+void Collectables::LoadTextures() {
+	Texture temp;
+	std::string directory = "Textures/Collectables";
+	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory)) {
+		if (entry.path().extension() == ".png") {
+			std::string pathString = entry.path().string();
+			const char* path = pathString.c_str();
+			Textures.push_back(temp);
+			Textures[Textures.size() - 1].SetTexture(load(path, renderer));
+			std::string temp = "";
+			for (size_t i = directory.length(); i < pathString.length(); i++)
+			{
+				if (pathString[i + 1] == '.') {
+					break;
+				}
+				temp += pathString[i + 1];
+			}
+			Textures[Textures.size() - 1].SetName(temp);
+			temp = "";
+		}
+	}
 }
 
-void Collectables::SetTextureShortSword(SDL_Texture * temptex) {
-    textureShortSword = temptex;
+void LoadObject(std::vector<CollectableWeapon*>& vec1, Texture& texture, std::ifstream& levelFile, std::string& line) {
+	vec1[vec1.size() - 1]->SetTexture(texture.GetTexture());
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->x = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->y = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->w = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->h = std::stoi(line);
 }
 
-SDL_Texture* Collectables::GetTextureCoin() {
-	return textureCoin;
-}
-
-void Collectables::SetTextureCoin(SDL_Texture* temptex) {
-	textureCoin = temptex;
-}
-
-SDL_Texture* Collectables::GetTextureMedKit() {
-	return textureMedKit;
-}
-
-void Collectables::SetTextureMedKit(SDL_Texture* temptex) {
-	textureMedKit = temptex;
+void LoadObject(std::vector<Pickable*>& vec1, Texture& texture, std::ifstream& levelFile, std::string& line) {
+	vec1[vec1.size() - 1]->SetTexture(texture.GetTexture());
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->x = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->y = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->w = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->h = std::stoi(line);
 }
 
 void Collectables::LoadEquipment() {
@@ -49,38 +137,30 @@ void Collectables::LoadEquipment() {
 		while (getline(levelFile, line)) {
 			if (line == "shortSword") {
 				Weapons.push_back(new ShortSword());
-				getline(levelFile, line);
-				Weapons[Weapons.size() - 1]->GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Weapons[Weapons.size() - 1]->GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Weapons[Weapons.size() - 1]->GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Weapons[Weapons.size() - 1]->GetRectangle()->h = std::stoi(line);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Weapons, Textures[i], levelFile, line);
+					}
+				}
 			}
 			else if (line == "coin") {
 				Pickables.push_back(new Point());
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Pickables[Pickables.size() - 1]->SetTexture(textureCoin);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Pickables, Textures[i], levelFile, line);
+					}
+				}
 			}
 			else if (line == "medKit") {
 				Pickables.push_back(new MedKit());
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Pickables[Pickables.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Pickables[Pickables.size() - 1]->SetTexture(textureMedKit);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Pickables, Textures[i], levelFile, line);
+					}
+				}
 			}
 		}
 	}
@@ -95,15 +175,11 @@ void Collectables::DetectCollison(UI * ui, Player* player,SDL_Rect camRect) {
 	{
 		if (SimpleCollision(camRect, *Weapons[i]->GetRectangle())) {
 			Weapons[i]->SetRenderable(true);
-			switch (SimpleCollision(*player->GetRectangle(), *Weapons[i]->GetRectangle()))
+			if (SimpleCollision(*player->GetRectangle(), *Weapons[i]->GetRectangle()))
 			{
-				case 0:
-					break;
-				case 1:
-					player->SetWeapon(Weapons[i]->GetRectangle()->w, Weapons[i]->GetRectangle()->h, 10, textureShortSword);
-					delete Weapons[i];
-					Weapons.erase(Weapons.begin() + i);
-					break;
+				player->SetWeapon(Weapons[i]->GetRectangle()->w, Weapons[i]->GetRectangle()->h, 10, Weapons[i]->GetTexture());
+				delete Weapons[i];
+				Weapons.erase(Weapons.begin() + i);
 			}
 		}
 		else
@@ -115,16 +191,14 @@ void Collectables::DetectCollison(UI * ui, Player* player,SDL_Rect camRect) {
 	{
 		if (SimpleCollision(camRect, *Pickables[i]->GetRectangle())) {
 			Pickables[i]->SetRenderable(true);
-			switch (SimpleCollision(*player->GetRectangle(), *Pickables[i]->GetRectangle()))
-			{
-				case 0:
-					break;
-				case 1:
-					Pickables[i]->Interaction(player,ui);
-					delete Pickables[i];
-					Pickables.erase(Pickables.begin() + i);
-					break;
+			if (Pickables[i]->CollisionPlayer(player, ui)){
+				delete Pickables[i];
+				Pickables.erase(Pickables.begin() + i);
 			}
+		}
+		else
+		{
+			Pickables[i]->SetRenderable(false);
 		}
 	}
 }
@@ -144,7 +218,7 @@ void Collectables::RenderCollectableWeapon(SDL_Rect camRect) {
 			temp.w = Weapons[i]->GetRectangle()->w;
 			temp.h = Weapons[i]->GetRectangle()->h;
 
-			SDL_RenderCopy(renderer, textureShortSword, NULL, &temp);
+			SDL_RenderCopy(renderer, Weapons[i]->GetTexture(), NULL, &temp);
 		}
 	}
 	
@@ -167,42 +241,19 @@ void Collectables::RenderPickables(SDL_Rect camRect) {
 }
 
 
-SDL_Rect* CollectableWeapon::GetRectangle() {
-    return &rectangle;
-}
 
-bool CollectableWeapon::GetRenderable() { return renderable; }
-
-void CollectableWeapon::SetRenderable(bool temp) { renderable = temp; }
-
-
-SDL_Rect* Pickable::GetRectangle() {
-	return &rectangle;
-}
-
-bool Pickable::GetRenderable() { return renderable; }
-
-void Pickable::SetRenderable(bool temp) { renderable = temp; }
-
-SDL_Texture* Pickable::GetTexture() {
-	return texture;
-}
-
-void Pickable::SetTexture(SDL_Texture* temptex) {
-	texture = temptex;
-}
-
-void Point::Interaction(Player* player, UI* ui) {
-	SoundManager::PlayCoinSound();
-	ui->SetScore(ui->GetScore() + 10);
-}
-
-void MedKit::Interaction(Player* player, UI* ui) {
-	SoundManager::PlayMedKitSound();
-	ui->AddHearth();
-}
 
 Collectables::~Collectables() {
-	SDL_DestroyTexture(textureShortSword);
-	SDL_DestroyTexture(textureCoin);
+	for (auto it:Textures)
+	{
+		SDL_DestroyTexture(it.GetTexture());
+	}
+	for (auto weapon : Weapons) {
+		delete weapon;
+	}
+	Weapons.clear();
+	for (auto pickable : Pickables) {
+		delete pickable;
+	}
+	Pickables.clear();
 }

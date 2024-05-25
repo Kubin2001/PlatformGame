@@ -3,6 +3,7 @@
 #include <vector>
 #include <SDL.h>
 #include "Player.h"
+#include "TextureManager.h"
 
 
 class Pickable {
@@ -18,7 +19,7 @@ class Pickable {
         virtual SDL_Texture* GetTexture();
         virtual void SetTexture(SDL_Texture* temptex);
 
-        virtual void Interaction(Player* player, UI* ui) = 0;
+        virtual bool CollisionPlayer(Player* player, UI* ui) = 0;
 };
 
 class Point : public Pickable {
@@ -27,14 +28,14 @@ class Point : public Pickable {
     public:
         Point() {}
 
-        void Interaction(Player * player, UI * ui)override;
+        bool CollisionPlayer(Player * player, UI * ui)override;
 };
 
 class MedKit : public Pickable {
     public:
         MedKit() {}
 
-        void Interaction(Player* player, UI* ui)override;
+        bool CollisionPlayer(Player* player, UI* ui)override;
 
 };
 
@@ -45,11 +46,14 @@ class CollectableWeapon {
         SDL_Rect rectangle;
         int damage = 10;
         bool renderable = false;
+        SDL_Texture* texture;
 
     public:
         virtual SDL_Rect* GetRectangle();
         virtual bool GetRenderable();
         virtual void SetRenderable(bool temp);
+        virtual SDL_Texture* GetTexture();
+        virtual void SetTexture(SDL_Texture* temptex);
 };
 
 class ShortSword : public CollectableWeapon {
@@ -61,25 +65,18 @@ class ShortSword : public CollectableWeapon {
 class Collectables
 {
     private:
-        SDL_Texture *textureShortSword = nullptr;
-        SDL_Texture *textureCoin = nullptr;
-        SDL_Texture* textureMedKit = nullptr;
-
         SDL_Renderer *renderer = nullptr;
         std::vector<CollectableWeapon*> Weapons;
         std::vector<Pickable*> Pickables;
 
+        std::vector<Texture> Textures;
+
     public:
         Collectables(SDL_Renderer *renderer);
 
-        SDL_Texture *GetTextureShortSword();
-        void SetTextureShortSword(SDL_Texture* temptex);
-        SDL_Texture* GetTextureCoin();
-        void SetTextureCoin(SDL_Texture* temptex);
-        SDL_Texture* GetTextureMedKit();
-        void SetTextureMedKit(SDL_Texture* temptex);
+        std::vector<Texture>& getTextures();
 
-
+        void LoadTextures();
         void LoadEquipment();
         void DetectCollison(UI* ui, Player* player, SDL_Rect camRect);
 

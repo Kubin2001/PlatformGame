@@ -1,6 +1,11 @@
 #include <iostream>
 #include <SDL.h>
 #include "Font.h"
+
+Font::Font() {
+
+}
+
 SDL_Texture* Font::GetTexture() {
     return texture;
 }
@@ -169,4 +174,8 @@ void Font::RenderText(SDL_Renderer* renderer, std::string text, int x, int y, in
         rectangle.x += step;
     }
     rectangle.x = temp;
+}
+
+Font::~Font() {
+    SDL_DestroyTexture(texture);
 }

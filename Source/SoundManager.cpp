@@ -114,6 +114,10 @@ void SoundManager::UnLoadGame() {
 	soundPirateAttack = nullptr;
 	Mix_FreeChunk(soundWin);
 	soundWin = nullptr;
+	Mix_FreeChunk(soundCoin);
+	soundCoin = nullptr;
+	Mix_FreeChunk(soundMedKit);
+	soundMedKit = nullptr;
 }
 
 void SoundManager::UnLoadEditor() {

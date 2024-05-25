@@ -11,6 +11,8 @@ private:
     SDL_Texture* texture = nullptr;
 
 public:
+    Font();
+
     SDL_Rect* GetRectangle();
 
     SDL_Texture* GetTexture();
@@ -20,4 +22,6 @@ public:
     void LoadText(int amount, int stepW, int stepH);
 
     void RenderText(SDL_Renderer* renderer, std::string text, int x, int y, int w, int h, int step);
+
+    ~Font();
 };

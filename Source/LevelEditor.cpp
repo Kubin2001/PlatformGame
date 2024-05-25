@@ -563,6 +563,15 @@ LevelEditor::~LevelEditor() {
     for (size_t i = 0; i < equipmentObjects.size(); ++i) {
         SDL_DestroyTexture(equipmentObjects[i].text);
     }
+    for (size_t i = 0; i < decorationsObjects.size(); ++i) {
+        SDL_DestroyTexture(decorationsObjects[i].text);
+    }
+    mapObjects.clear();
+    mobsObjects.clear();
+    equipmentObjects.clear();
+    decorationsObjects.clear();
+    rectangles.clear();
+    objects.clear();
 
     SDL_DestroyTexture(texturePlayer);
 }

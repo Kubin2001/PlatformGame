@@ -121,10 +121,6 @@ void ParticlesManager::CheckColisionMobs(Mobs* mobs,SDL_Rect camRect) {
                     mobs->getEnemies()[j]->setInvTime(20);
                     mobs->getEnemies()[j]->MakeAgressive();
                     PlayerAttackParticles[i].SetLifeTime(0);
-                    if (mobs->getEnemies()[j]->getHitPoints() < 1) {
-                        SoundManager::PlayEnemyDeathSound();
-                        mobs->getEnemies().erase(mobs->getEnemies().begin() + j);
-                    }
                 }
             }
         }

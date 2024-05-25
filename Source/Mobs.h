@@ -11,6 +11,7 @@
 #include "Colision.h"
 #include "ParticlesManager.h"
 #include "Camera.h"
+#include "TextureManager.h"
 
 class Player;
 
@@ -142,38 +143,27 @@ class Pirate : public Enemy {
 		}
 };
 
-
 class Mobs {
 	private:
 		SDL_Renderer* renderer;
 
 		std::vector<Enemy*> Enemies;
 
-		SDL_Texture *textureCharger = nullptr;
+		std::vector<Texture> Textures;
 
-		SDL_Texture *textureWolf = nullptr;
-
-		SDL_Texture *texturePirate = nullptr;
 
 	public:
 		Mobs(SDL_Renderer* renderer);
 
 		//getters and setters
-		SDL_Texture* GetTextureCharger();
-
-		void SetTextureCharger(SDL_Texture* temptex);
-
-		SDL_Texture* GetTextureWolf();
-
-		void SetTextureWolf(SDL_Texture* temptex);
-
-		SDL_Texture* GetTexturePirate();
-
-		void SetTexturePirate(SDL_Texture* temptex);
 
 		std::vector<Enemy*>& getEnemies();
 
+		std::vector<Texture>& getTextures();
+
 		//getters and setters
+
+		void LoadTextures();
 
 		void LoadMobs();
 

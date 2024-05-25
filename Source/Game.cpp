@@ -11,6 +11,7 @@ extern int localWindow;
 extern bool status;
 extern int windowWidth;
 extern int windowHeight;
+extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
 
 Game::Game() {
     window = nullptr;
@@ -32,6 +33,7 @@ void Game::SetUpWindow() {
     renderer = SDL_CreateRenderer(window, -1, 0);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    textback = (load("Textures/background.png", renderer));
 }
 
 void Game::Start() {
@@ -73,7 +75,6 @@ void Game::LoadTextures() {
     switch (windowtype)
     {
     case 1:
-        textback = (load("Textures/background.png", renderer));
         ui->SetTextureButton(load("Textures/Interface/button.png", renderer));
         ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
         ui->SetTextureButtonInfo(load("Textures/Interface/buttonInfo.png", renderer));
@@ -81,26 +82,11 @@ void Game::LoadTextures() {
     case 2:
         player->SetTexture(load("Textures/player.png", renderer));
         particlesManager->SetTexture(load("Textures/Particles/wave.png", renderer));
-        map->SetTextureFloor(load("Textures/Terrain/grass.png", renderer));
-        map->SetTexturePlatform(load("Textures/Terrain/platform.png", renderer));
-        map->SetTexturePlatform2(load("Textures/Terrain/platform2.png", renderer));
-        map->SetTexturePilar(load("Textures/Terrain/pillar.png", renderer));
-        map->SetTexturePilar2(load("Textures/Terrain/pillar2.png", renderer));
-        map->SetTextureLava(load("Textures/Terrain/lava.png", renderer));
-        map->SetTexturePalmTree(load("Textures/Decorations/palmTree.png", renderer));
-        map->SetTextureCactus(load("Textures/Decorations/cactus.png", renderer));
-        map->SetTextureBoulder(load("Textures/Decorations/boulder.png", renderer));
-        map->SetTextureBarrel(load("Textures/Decorations/barrel.png", renderer));
-        //map->textureInvWall = load("Textures/Terrain/invWall.png", renderer);
-        map->SetTextureFlag(load("Textures/Terrain/flag.png", renderer));
-        mobs->SetTextureCharger(load("Textures/Mobs/charger.png", renderer));
-        mobs->SetTextureWolf(load("Textures/Mobs/wolf.png", renderer));
-        mobs->SetTexturePirate(load("Textures/Mobs/pirate.png", renderer));
+        map->LoadTextures();
+        mobs->LoadTextures();
         ui->SetTextureHearth(load("Textures/Interface/hearth.png", renderer));
         ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
-        collectables->SetTextureShortSword(load("Textures/Collectables/shortSword.png", renderer));
-        collectables->SetTextureCoin(load("Textures/Collectables/coin.png", renderer));
-        collectables->SetTextureMedKit(load("Textures/Collectables/medKit.png", renderer));
+        collectables->LoadTextures();
         ui->SetTextureButtonInfo(load("Textures/Interface/buttonInfo.png", renderer));
         break;
     case 3:
@@ -184,7 +170,6 @@ void Game::Movement() {
         player->Move(state);
         camera->UpdatePosition(*player->GetRectangle());
         player->Attack(state,particlesManager);
-        map->MoveMap(state, player);
         mobs->MoveMobs(state, player,map,particlesManager);
         particlesManager->MoveParticles(state,player);
         break;
@@ -203,9 +188,9 @@ void Game::Render() {
         ui->Render();
         break;
     case 2:
-        map->RenderDecorations(*camera->GetRectangle());
-        player->Render(*camera->GetRectangle());
         map->Render(*camera->GetRectangle());
+        player->Render(*camera->GetRectangle());
+        map->RenderObjectsPostPlayer(*camera->GetRectangle());
         mobs->Render(*camera->GetRectangle());
         ui->Render();
         collectables->Render(*camera->GetRectangle());
@@ -222,16 +207,24 @@ void Game::Clear() {
     switch (windowtype) {
     case 1:
         delete ui;
+        ui = nullptr;
         break;
     case 2:
         framesCounter = 0;
         delete camera;
+        camera = nullptr;
         delete ui;
+        ui = nullptr;
         delete player;
+        player = nullptr;
         delete map;
+        map = nullptr;
         delete mobs;
+        mobs = nullptr;
         delete collectables;
+        collectables = nullptr;
         delete particlesManager;
+        particlesManager = nullptr;
         SoundManager::UnLoadGame();
         break;
     case 3:
@@ -242,13 +235,6 @@ void Game::Clear() {
 
 void Game::SetWindow() {
     windowtype = localWindow;
-}
-
-SDL_Texture* Game::load(const char* file, SDL_Renderer* ren) {
-    SDL_Surface* tmpSurface = IMG_Load(file);
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(ren, tmpSurface);
-    SDL_FreeSurface(tmpSurface);
-    return tex;
 }
 
 

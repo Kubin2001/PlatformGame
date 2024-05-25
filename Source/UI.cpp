@@ -353,4 +353,10 @@ UI::~UI() {
     SDL_DestroyTexture(texturehearth);
     SDL_DestroyTexture(textureButton);
     SDL_DestroyTexture(textureButtonInfo);
+    if (!Buttons.empty()) {
+        Buttons.clear();
+    }
+    if (!HP.empty()) {
+        HP.clear();
+    }
 }

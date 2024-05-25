@@ -50,8 +50,6 @@ public:
 
 	void SetWindow();
 
-	SDL_Texture* load(const char* file, SDL_Renderer* ren);
-
 	~Game();
 
 };

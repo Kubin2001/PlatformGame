@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <SDL.h>
+#include <filesystem>
 
 #include "Mobs.h"
 #include "Player.h"
@@ -9,9 +10,11 @@
 #include "Map.h"
 #include "Camera.h"
 #include "SoundManager.h"
+#include "TextureManager.h"
 
 extern std::string levelName;
 
+extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
 
 Mobs::Mobs(SDL_Renderer* renderer) {
 	this->renderer = renderer;
@@ -159,9 +162,9 @@ void Wolf::Movement(Player* player, Map* map, ParticlesManager* particleManager)
 	else
 	{
 		cProj->MoveProjectlile();
-		for (int i = 0; i < map->getMapObjects().size(); i++)
+		for (int i = 0; i < map->getObjects().size(); i++)
 		{
-			if (SimpleCollision(*cProj->GetRectangle(), *map->getMapObjects()[i].GetRectangle()) == 1)
+			if (SimpleCollision(*cProj->GetRectangle(), *map->getObjects()[i]->GetRectangle()) == 1)
 			{
 				cProj->SetTimer(50);
 				break;
@@ -238,9 +241,9 @@ void Pirate::Movement(Player* player, Map* map, ParticlesManager* particleManage
 		else
 		{
 			cProj->MoveProjectlile();
-			for (int i = 0; i < map->getMapObjects().size(); i++)
+			for (int i = 0; i < map->getObjects().size(); i++)
 			{
-				if (SimpleCollision(*cProj->GetRectangle(), *map->getMapObjects()[i].GetRectangle()) == 1)
+				if (SimpleCollision(*cProj->GetRectangle(), *map->getObjects()[i]->GetRectangle()) == 1)
 				{
 					cProj->SetTimer(50);
 					break;
@@ -343,78 +346,83 @@ void Pirate::MakeAgressive() {
 }
 
 //getters and setters
-SDL_Texture* Mobs::GetTextureCharger() {
-    return textureCharger;
-}
-
-void Mobs::SetTextureCharger(SDL_Texture* temptex) {
-    textureCharger = temptex;
-}
-
-SDL_Texture* Mobs::GetTextureWolf() {
-	return textureWolf;
-}
-
-void Mobs::SetTextureWolf(SDL_Texture* temptex) {
-	textureWolf = temptex;
-}
-
-SDL_Texture* Mobs::GetTexturePirate() {
-	return texturePirate;
-}
-
-void Mobs::SetTexturePirate(SDL_Texture* temptex) {
-	texturePirate = temptex;
+std::vector<Texture>& Mobs::getTextures() {
+	return Textures;
 }
 
 std::vector<Enemy*>& Mobs::getEnemies() { return Enemies; }
 
 //getters and setters
 
+
+void Mobs::LoadTextures() {
+	Texture temp;
+	std::string directory = "Textures/Mobs";
+	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory)) {
+		if (entry.path().extension() == ".png") {
+			std::string pathString = entry.path().string();
+			const char* path = pathString.c_str();
+			Textures.push_back(temp);
+			Textures[Textures.size() - 1].SetTexture(load(path, renderer));
+			std::string temp = "";
+			for (size_t i = directory.length(); i < pathString.length(); i++)
+			{
+				if (pathString[i + 1] == '.') {
+					break;
+				}
+				temp += pathString[i + 1];
+			}
+			Textures[Textures.size() - 1].SetName(temp);
+			temp = "";
+		}
+	}
+}
+
+void LoadObject(std::vector<Enemy*>& vec1, Texture& texture, std::ifstream& levelFile, std::string& line) {
+	vec1[vec1.size() - 1]->setTexture(texture.GetTexture());
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->x = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->y = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->w = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->h = std::stoi(line);
+}
+
 void Mobs::LoadMobs() {
 	std::ifstream levelFile(levelName);
 	std::string line;
-	int xCord = 0;
-	int yCord = 0;
 	if (levelFile.is_open()) {
 		while (getline(levelFile, line)) {
 			if (line == "charger") {
 				Enemies.push_back(new Charger());
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Enemies[Enemies.size() - 1]->setTexture(textureCharger);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Enemies, Textures[i], levelFile, line);
+					}
+				}
 			}
 			else if (line == "wolf") {
 				Enemies.push_back(new Wolf());
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Enemies[Enemies.size() - 1]->setTexture(textureWolf);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Enemies, Textures[i], levelFile, line);
+					}
+				}
 			}
 
 			else if (line == "pirate") {
 				Enemies.push_back(new Pirate());
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Enemies[Enemies.size() - 1]->GetRectangle()->h = std::stoi(line);
-				Enemies[Enemies.size() - 1]->setTexture(texturePirate);
-				Enemies[Enemies.size() - 1]->LoadAnimations(41);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Enemies, Textures[i], levelFile, line);
+						Enemies[Enemies.size() - 1]->LoadAnimations(41);
+					}
+				}
 
 			}
 		}
@@ -442,20 +450,9 @@ void Mobs::DetectColison(Player* player,Map *map, SDL_Rect camRect) {
 		Enemies[i]->setColison(false, 1);
 		Enemies[i]->setColison(false, 2);
 
-		for (int j = 0; j < map->getMapObjects().size(); j++)
+		for (int j = 0; j < map->getObjects().size(); j++)
 		{
-			switch (Collision(*Enemies[i]->GetRectangle(), *map->getMapObjects()[j].GetRectangle()))
-			{
-			case 1:
-				Enemies[i]->setColison(true, 0);
-				break;
-			case 2:
-				Enemies[i]->setColison(true, 1);
-				break;
-			case 3:
-				Enemies[i]->setColison(true, 2);
-				break;
-			}
+			map->getObjects()[j]->MobCollision(Enemies[i]);
 		}
 
 		for (int j = 0; j < map->getInvWalls().size(); j++)
@@ -490,17 +487,19 @@ void Mobs::DetectColison(Player* player,Map *map, SDL_Rect camRect) {
 					player->setJumpBuffer(15);
 					SoundManager::PlayPlayerJumpSound();
 					Enemies[i]->setHitPoints(Enemies[i]->getHitPoints() - 10);
-					if (Enemies[i]->getHitPoints() < 1) {
-						SoundManager::PlayEnemyDeathSound();
-						delete Enemies[i];
-						Enemies.erase(Enemies.begin() + i);
-					}
 				}
 				break;
 			case 3:
 				player->setColison(true, 2);
 				player->SetDamage(true);
 				break;
+		}
+	}
+	for (int i = 0; i < Enemies.size(); i++) {
+		if (Enemies[i]->getHitPoints() < 1) {
+			SoundManager::PlayEnemyDeathSound();
+			delete Enemies[i];
+			Enemies.erase(Enemies.begin() + i);
 		}
 	}
 }
@@ -555,5 +554,12 @@ void Mobs::Render(SDL_Rect camRect) {
 
 
 Mobs::~Mobs() {
-	SDL_DestroyTexture(textureCharger);
+	for (auto it : Textures)
+	{
+		SDL_DestroyTexture(it.GetTexture());
+	}
+	for (auto enemy : Enemies) {
+		delete enemy;
+	}
+	Enemies.clear();
 }

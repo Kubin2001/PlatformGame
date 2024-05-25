@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <filesystem>
 
 #include "Map.h"
 #include "Player.h"
@@ -8,156 +9,239 @@
 #include "UI.h"
 #include "Camera.h"
 #include "SoundManager.h"
+#include "TextureManager.h"
 
 extern int windowtype;
 extern int localWindow;
 extern std::string levelName;
 
+extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
+
+//Top Objects
+
+SDL_Rect* Object::GetRectangle() { return &rectangle; }
+
+bool Object::GetRenderable() { return renderable; }
+
+void Object::SetRenderable(bool temp) { renderable = temp; }
+
+SDL_Texture* Object::GetTexture() { return texture; }
+
+void Object::SetTexture(SDL_Texture* temptex) { texture = temptex; }
+
+
+void MapObject::PlayerCollision(Player* player, UI* ui) {
+	switch (Collision(*player->GetRectangle(), *GetRectangle()))
+	{
+	case 1:
+		player->setColison(true, 0);
+		break;
+	case 2:
+		player->setColison(true, 1);
+		break;
+	case 3:
+		player->setColison(true, 2);
+		break;
+	case 4:
+		player->setColison(true, 3);
+		break;
+	}
+}
+
+void Decoration::PlayerCollision(Player* player, UI* ui) {
+
+}
+
+void Lava::PlayerCollision(Player* player, UI* ui) {
+	if (SimpleCollision(*player->GetRectangle(), *GetRectangle())) {
+		player->SetDamage(true);
+		player->GetRectangle()->y -= 3;
+	}
+}
+
+void Flag::PlayerCollision(Player* player,UI * ui) {
+	if (SimpleCollision(*player->GetRectangle(), *GetRectangle())) {
+		SoundManager::PlayPlayerWinSound();
+		ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
+		SDL_Delay(4000);
+		localWindow = 1;
+	}
+}
+
+
+void MapObject::MobCollision(Enemy* enemy) {
+	switch (Collision(*enemy->GetRectangle(), *GetRectangle()))
+	{
+	case 1:
+		enemy->setColison(true, 0);
+		break;
+	case 2:
+		enemy->setColison(true, 1);
+		break;
+	case 3:
+		enemy->setColison(true, 2);
+		break;
+	}
+	
+}
+void Decoration::MobCollision(Enemy* enemy) {
+
+}
+void Lava::MobCollision(Enemy* enemy) {
+	if (SimpleCollision(*enemy->GetRectangle(), *GetRectangle()))
+	{
+		enemy->setHitPoints(enemy->getHitPoints() - 10);
+		enemy->setInvTime(20);
+	}
+}
+
+void Flag::MobCollision(Enemy* enemy) {
+
+}
+
+SDL_Rect* InvWall::GetRectangle() { return &rectangle; }
+
+bool InvWall::GetRenderable() { return renderable; }
+
+void InvWall::SetRenderable(bool temp) { renderable = temp; }
+//Top Objects
+
 Map::Map(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 }
 //getters and setters
-SDL_Texture* Map::GetTextureFloor() { return textureFloor; }
-
-void Map::SetTextureFloor(SDL_Texture* temptex) { textureFloor = temptex; }
-
-SDL_Texture* Map::GetTexturePLatform() { return texturePlatform; }
-
-void Map::SetTexturePlatform(SDL_Texture* temptex) { texturePlatform = temptex; }
-
-SDL_Texture* Map::GetTexturePLatform2() { return texturePlatform2; }
-
-void Map::SetTexturePlatform2(SDL_Texture* temptex) { texturePlatform2 = temptex; }
-
-SDL_Texture* Map::GetTexturePilar() { return texturePillar; }
-
-void Map::SetTexturePilar(SDL_Texture* temptex) { texturePillar = temptex; }
-
-SDL_Texture* Map::GetTexturePilar2() { return texturePillar; }
-
-void Map::SetTexturePilar2(SDL_Texture* temptex) { texturePillar2 = temptex; }
-
-SDL_Texture* Map::GetTextureFlag() { return textureFlag; }
-
-void Map::SetTextureFlag(SDL_Texture* temptex) { textureFlag = temptex; }
-
-SDL_Texture* Map::GetTextureLava() { return textureFlag; }
-
-void Map::SetTextureLava(SDL_Texture* temptex) { textureLava = temptex; }
-
-SDL_Texture* Map::GetTexturePalmTree() { return texturePalmTree; }
-
-void Map::SetTexturePalmTree(SDL_Texture* temptex) { texturePalmTree = temptex; }
-
-SDL_Texture* Map::GetTextureCactus() { return textureCactus; }
-
-void Map::SetTextureCactus(SDL_Texture* temptex) { textureCactus = temptex; }
-
-SDL_Texture* Map::GetTextureBoulder() { return textureBoulder; }
-
-void Map::SetTextureBoulder(SDL_Texture* temptex) { textureBoulder = temptex; }
-
-SDL_Texture* Map::GetTextureBarrel() { return textureBarrel; }
-
-void Map::SetTextureBarrel(SDL_Texture* temptex) { textureBarrel = temptex; }
+std::vector<Object*>& Map::getObjects() {
+	return Objects;
+}
 
 
+std::vector<InvWall>& Map::getInvWalls() {
+	return InvWalls;
+}
 
+std::vector<Texture>& Map::getTextures() {
+	return Textures;
+}
 
 //getters and setters
 
+void Map::LoadTextures() {
+	Texture temp;
+	std::string directory = "Textures/Terrain";
+	std::string directory2 = "Textures/Decorations";
+	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory)) {
+		if (entry.path().extension() == ".png") {
+			std::string pathString = entry.path().string();
+			const char* path = pathString.c_str();
+			Textures.push_back(temp);
+			Textures[Textures.size() - 1].SetTexture(load(path, renderer));
+			std::string temp = "";
+			for (size_t i = directory.length(); i < pathString.length(); i++)
+			{
+				if (pathString[i + 1] == '.') {
+					break;
+				}
+				temp += pathString[i + 1];
+			}
+			Textures[Textures.size() - 1].SetName(temp);
+			temp = "";
+		}
+	}
+
+	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory2)) {
+		if (entry.path().extension() == ".png") {
+			std::string pathString = entry.path().string();
+			const char* path = pathString.c_str();
+			Textures.push_back(temp);
+			Textures[Textures.size() - 1].SetTexture(load(path, renderer));
+			std::string temp = "";
+			for (size_t i = directory2.length(); i < pathString.length(); i++)
+			{
+				if (pathString[i + 1] == '.') {
+					break;
+				}
+				temp += pathString[i + 1];
+			}
+			Textures[Textures.size() - 1].SetName(temp);
+			temp = "";
+		}
+	}
+}
+
+void LoadObject(std::vector<Object*>& vec1, Texture& texture,std::ifstream &levelFile,std::string &line) {
+	vec1[vec1.size() - 1]->SetTexture(texture.GetTexture());
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->x = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->y = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->w = std::stoi(line);
+	getline(levelFile, line);
+	vec1[vec1.size() - 1]->GetRectangle()->h = std::stoi(line);
+}
+
 void Map::CreateLevel() {
-	MapObject mapObject;
-	Decoration decoration;
-	Flag flag;
 	InvWall invWall;
-	Lava lava;
 	std::ifstream levelFile(levelName);
 	std::string line;
+	int decorationCount = 0;
 	if (levelFile.is_open()) {
 		while (getline(levelFile, line)) {
-			if (line == "platform" || line == "platform2" || line == "pillar" || line == "pillar2" || line == "grass") {
-				MapObjects.push_back(mapObject);
-				if (line == "platform") {
-					MapObjects[MapObjects.size() - 1].SetTexture(texturePlatform);
+			if (line == "palmTree" || line == "cactus" || line == "boulder" || line == "barrel") {
+				Objects.push_back(new Decoration());
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Objects, Textures[i], levelFile, line);
+						std::swap(Objects[Objects.size() - 1], Objects[decorationCount]);
+						decorationCount++;
+					}
 				}
-				else if (line == "platform2") {
-					MapObjects[MapObjects.size() - 1].SetTexture(texturePlatform2);
+			}
+			else if (line == "platform" || line == "platform2" || line == "pillar" || line == "pillar2" || line == "grass") {
+				Objects.push_back(new MapObject());
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Objects, Textures[i], levelFile, line);
+					}
 				}
-				else if (line == "pillar") {
-					MapObjects[MapObjects.size() - 1].SetTexture(texturePillar);
-				}
-				else if (line == "pillar2") {
-					MapObjects[MapObjects.size() - 1].SetTexture(texturePillar2);
-				}
-				else if (line == "grass") {
-					MapObjects[MapObjects.size() - 1].SetTexture(textureFloor);
-				}
-				getline(levelFile, line);
-				MapObjects[MapObjects.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				MapObjects[MapObjects.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				MapObjects[MapObjects.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				MapObjects[MapObjects.size() - 1].GetRectangle()->h = std::stoi(line);
 			}
 			else if (line == "flag") {
-				Flags.push_back(flag);
-				getline(levelFile, line);
-				Flags[Flags.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Flags[Flags.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Flags[Flags.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Flags[Flags.size() - 1].GetRectangle()->h = std::stoi(line);
+				Objects.push_back(new Flag());
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Objects, Textures[i], levelFile, line);
+					}
+				}
+			}
+			else if (line == "lava") {
+				Objects.push_back(new Lava());
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						LoadObject(Objects, Textures[i], levelFile, line);
+					}
+				}
+				postPlayerRenderables.push_back(Objects[Objects.size() - 1]);
+
 			}
 			else if (line == "invWall") {
 				InvWalls.push_back(invWall);
-				getline(levelFile, line);
-				InvWalls[InvWalls.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				InvWalls[InvWalls.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				InvWalls[InvWalls.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				InvWalls[InvWalls.size() - 1].GetRectangle()->h = std::stoi(line);
-			}
-			else if (line == "lava") {
-				Lavas.push_back(lava);
-				Lavas[Lavas.size() - 1].SetTexture(textureLava);
-				getline(levelFile, line);
-				Lavas[Lavas.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Lavas[Lavas.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Lavas[Lavas.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Lavas[Lavas.size() - 1].GetRectangle()->h = std::stoi(line);
-			}
-			else if (line == "palmTree" || line == "cactus" || line == "boulder" || line == "barrel") {
-				Decorations.push_back(decoration);
-				if (line == "palmTree") {
-					Decorations[Decorations.size() - 1].SetTexture(texturePalmTree);
+				for (int i = 0; i < Textures.size(); i++)
+				{
+					if (Textures[i].GetName() == line) {
+						getline(levelFile, line);
+						InvWalls[InvWalls.size() - 1].GetRectangle()->x = std::stoi(line);
+						getline(levelFile, line);
+						InvWalls[InvWalls.size() - 1].GetRectangle()->y = std::stoi(line);
+						getline(levelFile, line);
+						InvWalls[InvWalls.size() - 1].GetRectangle()->w = std::stoi(line);
+						getline(levelFile, line);
+						InvWalls[InvWalls.size() - 1].GetRectangle()->h = std::stoi(line);
+					}
 				}
-				else if (line == "cactus") {
-					Decorations[Decorations.size() - 1].SetTexture(textureCactus);
-				}
-				else if (line == "boulder") {
-					Decorations[Decorations.size() - 1].SetTexture(textureBoulder);
-				}
-				else if (line == "barrel") {
-					Decorations[Decorations.size() - 1].SetTexture(textureBarrel);
-				}
-				getline(levelFile, line);
-				Decorations[Decorations.size() - 1].GetRectangle()->x = std::stoi(line);
-				getline(levelFile, line);
-				Decorations[Decorations.size() - 1].GetRectangle()->y = std::stoi(line);
-				getline(levelFile, line);
-				Decorations[Decorations.size() - 1].GetRectangle()->w = std::stoi(line);
-				getline(levelFile, line);
-				Decorations[Decorations.size() - 1].GetRectangle()->h = std::stoi(line);
 			}
 		}
 	}
@@ -168,194 +252,65 @@ void Map::CreateLevel() {
 }
 
 void Map::DetectColison(Player* player, UI* ui, Camera* camera) {
-	for (int i = 0; i < MapObjects.size(); i++)
+	for (int i = 0; i < Objects.size(); i++)
 	{
-		if (SimpleCollision(*camera->GetRectangle(), *MapObjects[i].GetRectangle())) {
-			MapObjects[i].SetRenderable(true);
-			switch (Collision(*player->GetRectangle(), *MapObjects[i].GetRectangle()))
-			{
-			case 1:
-				player->setColison(true, 0);
-				break;
-			case 2:
-				player->setColison(true, 1);
-				break;
-			case 3:
-				player->setColison(true, 2);
-				break;
-			case 4:
-				player->setColison(true, 3);
-				break;
-			}
+		if (SimpleCollision(*camera->GetRectangle(), *Objects[i]->GetRectangle())) {
+			Objects[i]->SetRenderable(true);
+			Objects[i]->PlayerCollision(player,ui);
 		}
 		else
 		{
-			MapObjects[i].SetRenderable(false);
-		}
-	}
-	for (int i = 0; i < Flags.size(); i++)
-	{
-		if (SimpleCollision(*camera->GetRectangle(), *Flags[i].GetRectangle())) {
-			Flags[i].SetRenderable(true);
-			switch (Collision(*Flags[i].GetRectangle(), *player->GetRectangle()))
-			{
-			case 3:
-				SoundManager::PlayPlayerWinSound();
-				ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON", 30, 31);
-				SDL_Delay(4000);
-				localWindow = 1;
-				break;
-			}
-		}
-		else
-		{
-			Flags[i].SetRenderable(false);
-		}
-	}
-
-	for (int i = 0; i < Lavas.size(); i++)
-	{
-		if (SimpleCollision(*camera->GetRectangle(), *Lavas[i].GetRectangle())) {
-			Lavas[i].SetRenderable(true);
-			if (SimpleCollision(*player->GetRectangle(), *Lavas[i].GetRectangle())) {
-				player->SetDamage(true);
-				player->GetRectangle()->y -= 3;
-			}
-		}
-		else
-		{
-			Lavas[i].SetRenderable(false);
-		}
-	}
-
-	for (int i = 0; i < Decorations.size(); i++)
-	{
-		if (SimpleCollision(*camera->GetRectangle(), *Decorations[i].GetRectangle())) {
-			Decorations[i].SetRenderable(true);
-		}
-		else
-		{
-			Decorations[i].SetRenderable(false);
-		}
-	}
-}
-
-void Map::MoveMap(const Uint8* state, Player* player) {
-
-}
-
-void Map::RenderDecorations(SDL_Rect camRect) {
-	SDL_Rect temp;
-	for (int i = 0; i < Decorations.size(); i++)
-	{
-		if (Decorations[i].GetRenderable()) {
-			temp.x = Decorations[i].GetRectangle()->x - camRect.x;
-			temp.y = Decorations[i].GetRectangle()->y - camRect.y;
-			temp.w = Decorations[i].GetRectangle()->w;
-			temp.h = Decorations[i].GetRectangle()->h;
-
-			SDL_RenderCopy(renderer, Decorations[i].GetTexture(), NULL, &temp);
+			Objects[i]->SetRenderable(false);
 		}
 	}
 }
 
 void Map::RenderObjects(SDL_Rect camRect) {
 	SDL_Rect temp;
-	for (int i = 0; i < MapObjects.size(); i++)
+	for (int i = 0; i < Objects.size(); i++)
 	{
-		if (MapObjects[i].GetRenderable()) {
-			temp.x = MapObjects[i].GetRectangle()->x - camRect.x;
-			temp.y = MapObjects[i].GetRectangle()->y - camRect.y;
-			temp.w = MapObjects[i].GetRectangle()->w;
-			temp.h = MapObjects[i].GetRectangle()->h;
+		if (Objects[i]->GetRenderable()) {
+			temp.x = Objects[i]->GetRectangle()->x - camRect.x;
+			temp.y = Objects[i]->GetRectangle()->y - camRect.y;
+			temp.w = Objects[i]->GetRectangle()->w;
+			temp.h = Objects[i]->GetRectangle()->h;
 
-			SDL_RenderCopy(renderer, MapObjects[i].GetTexture(), NULL, &temp);
+			SDL_RenderCopy(renderer, Objects[i]->GetTexture(), NULL, &temp);
 		}
 	}
 }
 
-void Map::RenderFlag(SDL_Rect camRect) {
+void Map::RenderObjectsPostPlayer(SDL_Rect camRect) {
 	SDL_Rect temp;
-	for (int i = 0; i < Flags.size(); i++)
+	for (int i = 0; i <postPlayerRenderables.size(); i++)
 	{
-		if (Flags[i].GetRenderable()) {
-			temp.x = Flags[i].GetRectangle()->x - camRect.x;
-			temp.y = Flags[i].GetRectangle()->y - camRect.y;
-			temp.w = Flags[i].GetRectangle()->w;
-			temp.h = Flags[i].GetRectangle()->h;
+		if (postPlayerRenderables[i]->GetRenderable()) {
+			temp.x = postPlayerRenderables[i]->GetRectangle()->x - camRect.x;
+			temp.y = postPlayerRenderables[i]->GetRectangle()->y - camRect.y;
+			temp.w = postPlayerRenderables[i]->GetRectangle()->w;
+			temp.h = postPlayerRenderables[i]->GetRectangle()->h;
 
-			SDL_RenderCopy(renderer, textureFlag, NULL, &temp);
-		}
-	}
-}
-
-
-void Map::RenderLava(SDL_Rect camRect) {
-	SDL_Rect temp;
-	for (int i = 0; i < Lavas.size(); i++)
-	{
-		if (Lavas[i].GetRenderable()) {
-			temp.x = Lavas[i].GetRectangle()->x - camRect.x;
-			temp.y = Lavas[i].GetRectangle()->y - camRect.y;
-			temp.w = Lavas[i].GetRectangle()->w;
-			temp.h = Lavas[i].GetRectangle()->h;
-
-			SDL_RenderCopy(renderer, textureLava, NULL, &temp);
+			SDL_RenderCopy(renderer, postPlayerRenderables[i]->GetTexture(), NULL, &temp);
 		}
 	}
 }
 
 void Map::Render(SDL_Rect camRect) {
 	RenderObjects(camRect);
-	RenderFlag(camRect);
-	RenderLava(camRect);
 	//for (int i = 0; i < InvWalls.size(); i++){
 	//	SDL_RenderCopy(renderer, textureInvWall, NULL, InvWalls[i].GetRectangle());
 	//}
 }
 
-SDL_Rect* Object::GetRectangle() { return &rectangle; }
-
-bool Object::GetRenderable() { return renderable; }
-
-void Object::SetRenderable(bool temp) { renderable = temp; }
-
-std::vector<MapObject>& Map::getMapObjects() {
-	return MapObjects;
-}
-
-std::vector<Decoration>& Map::getDecorations() {
-	return Decorations;
-}
-
-std::vector<Flag>& Map::getFlag() {
-	return Flags;
-}
-
-std::vector<InvWall>& Map::getInvWalls() {
-	return InvWalls;
-}
-
-std::vector<Lava>& Map::getLavas() {
-	return Lavas;
-}
-
-SDL_Texture* MapObject::GetTexture() { return texture; }
-
-void MapObject::SetTexture(SDL_Texture* temptex) { texture = temptex; }
-
-
-SDL_Texture* Decoration::GetTexture() { return texture; }
-
-void Decoration::SetTexture(SDL_Texture* temptex) { texture = temptex; }
-
-SDL_Texture* Lava::GetTexture() { return texture; }
-
-void Lava::SetTexture(SDL_Texture* temptex) { texture = temptex; }
 
 Map::~Map() {
-	SDL_DestroyTexture(textureFloor);
-	SDL_DestroyTexture(texturePlatform);
-	SDL_DestroyTexture(texturePillar);
-	SDL_DestroyTexture(textureFlag);
+	for (auto it:Textures)
+	{
+		SDL_DestroyTexture(it.GetTexture());
+	}
+	for (auto object : Objects) {
+		delete object;
+	}
+	Objects.clear();
+
 }
