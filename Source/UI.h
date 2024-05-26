@@ -4,6 +4,8 @@
 #include <vector>
 #include "Font.h"
 
+extern std::string scoreLevel;
+
 class ButtonInfo {
     private:
         SDL_Rect rectangle;
@@ -60,8 +62,6 @@ class UI
         int menuType = 0;
         int score = 0;
 
-        std::string scoreFilePath = "Data/HighScores/level1_score.txt";
-
     public:
         Font* font;
 
@@ -75,8 +75,6 @@ class UI
         void SetTextureButtonInfo(SDL_Texture* temptex);
         int GetScore();
         void SetScore(int temp);
-        std::string GetScorePath();
-        void SetScorePath(std::string temp);
 
         std::vector<Hearth> &getHP();
         void CreateHearths();

@@ -11,6 +11,7 @@ extern int localWindow;
 extern int windowWidth;
 extern int windowHeight;
 extern std::string levelName;
+extern std::string scoreLevel;
 
 UI::UI(SDL_Renderer *renderer){
     font = new Font();
@@ -38,14 +39,6 @@ int UI::GetScore() {
 }
 void UI::SetScore(int temp) {
     score = temp;
-}
-
-
-std::string UI::GetScorePath() {
-    return scoreFilePath;
-}
-void UI::SetScorePath(std::string temp) {
-    scoreFilePath = temp;
 }
 
 void UI::Render() {
@@ -245,7 +238,7 @@ void UI::CreateButtonInfo(int x, int y , int w, int h,std::string text,int textS
 }
 
 void UI::CreateScoreButton() {
-    std::ifstream scoreFile(scoreFilePath);
+    std::ifstream scoreFile(scoreLevel);
     std::string line = "";
     int counter = 1;
     std::string fullText = " HIGH SCORE/";
@@ -295,33 +288,43 @@ void UI::OnClick(SDL_Event event) {
             case 1:
                 if (SimpleCollision(mouse, *Buttons[0].GetRectangle()) == 1) {
                     levelName = "Levels/level1.txt";
+                    scoreLevel = "Data/HighScores/level1_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[1].GetRectangle()) == 1) {
                     levelName = "Levels/level2.txt";
+                    scoreLevel = "Data/HighScores/level2_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[2].GetRectangle()) == 1) {
                     levelName = "Levels/level3.txt";
+                    scoreLevel = "Data/HighScores/level3_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[3].GetRectangle()) == 1) {
                     levelName = "Levels/level4.txt";
+                    scoreLevel = "Data/HighScores/level4_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[4].GetRectangle()) == 1) {
                     levelName = "Levels/level5.txt";
+                    scoreLevel = "Data/HighScores/level5_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[5].GetRectangle()) == 1) {
                     levelName = "Levels/level6.txt";
+                    scoreLevel = "Data/HighScores/level6_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[6].GetRectangle()) == 1) {
                     levelName = "Levels/level7.txt";
+                    scoreLevel = "Data/HighScores/level7_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[7].GetRectangle()) == 1) {
                     levelName = "Levels/level8.txt";
+                    scoreLevel = "Data/HighScores/level8_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[8].GetRectangle()) == 1) {
                     levelName = "Levels/level9.txt";
+                    scoreLevel = "Data/HighScores/level9_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[9].GetRectangle()) == 1) {
                     levelName = "Levels/level10.txt";
+                    scoreLevel = "Data/HighScores/level10_score.txt";
                 }
                 else if (SimpleCollision(mouse, *Buttons[10].GetRectangle()) == 1) {
                     menuType = 0;
@@ -333,61 +336,61 @@ void UI::OnClick(SDL_Event event) {
                 if (SimpleCollision(mouse, *Buttons[0].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level1_score.txt";
+                    scoreLevel = "Data/HighScores/level1_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[1].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level2_score.txt";
+                    scoreLevel = "Data/HighScores/level2_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[2].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level3_score.txt";
+                    scoreLevel = "Data/HighScores/level3_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[3].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level4_score.txt";
+                    scoreLevel = "Data/HighScores/level4_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[4].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level5_score.txt";
+                    scoreLevel = "Data/HighScores/level5_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[5].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level6_score.txt";
+                    scoreLevel = "Data/HighScores/level6_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[6].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level7_score.txt";
+                    scoreLevel = "Data/HighScores/level7_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[7].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level8_score.txt";
+                    scoreLevel = "Data/HighScores/level8_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[8].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level9_score.txt";
+                    scoreLevel = "Data/HighScores/level9_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[9].GetRectangle()) == 1) {
                     menuType = 3;
                     Buttons.clear();
-                    scoreFilePath = "Data/HighScores/level10_score.txt";
+                    scoreLevel = "Data/HighScores/level10_score.txt";
                     CreateButton();
                 }
                 else if (SimpleCollision(mouse, *Buttons[10].GetRectangle()) == 1) {

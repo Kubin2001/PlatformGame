@@ -14,6 +14,7 @@
 extern int windowtype;
 extern int localWindow;
 extern std::string levelName;
+extern std::string scoreLevel;
 
 //Top Objects
 
@@ -64,7 +65,7 @@ void Flag::PlayerCollision(Player* player,UI * ui) {
 		SoundManager::PlayPlayerWinSound();
 		ui->CreateButtonInfo(550, 250, 300, 100, "YOU WON/SCORE:" + std::to_string(ui->GetScore()), 30, 31);
 		SDL_Delay(4000);
-		std::ifstream scoreFile("Data/HighScores/level1_score.txt");
+		std::ifstream scoreFile(scoreLevel);
 		std::string line = "";
 		int counter = 1;
 		std::vector<int> lines;
@@ -87,7 +88,7 @@ void Flag::PlayerCollision(Player* player,UI * ui) {
 
 		std::sort(lines.rbegin(), lines.rend());
 
-		std::ofstream outFile("Data/HighScores/level1_score.txt");
+		std::ofstream outFile(scoreLevel);
 		if (outFile.is_open()) {
 			for (int it : lines) {
 				outFile << it << "\n";
