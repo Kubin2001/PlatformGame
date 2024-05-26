@@ -52,9 +52,15 @@ class Decoration : public Object {
 };
 
 
-class Lava : public Object {
+class DangerousObject : public Object {
+	private:
+		int damage = 10;
+		bool floating = true;
 	public:
-		Lava() {}
+		DangerousObject(int damage, bool floating) {
+			this->damage = damage;
+			this->floating = floating;
+		}
 		void PlayerCollision(Player* player, UI* ui)override;
 
 		void MobCollision(Enemy* enemy)override;

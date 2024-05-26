@@ -7,23 +7,21 @@
 #include "LevelEditor.h"
 #include "UI.h"
 #include "Colision.h"
-
-extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
-
+#include "TextureManager.h"
 
 LevelEditor::LevelEditor(SDL_Renderer* renderer) {
     this->renderer = renderer;
     ui = new UI(renderer);
     ui->font->LoadText(40, 29, 29);
-    ui->CreateSingleButton(50, 0, 250, 50, "TERRAIN", 26, 27);
-    ui->CreateSingleButton(350, 0, 250, 50, "MOBS", 29, 30);
-    ui->CreateSingleButton(650, 0, 250, 50, "EQUIPMENT", 20, 21);
-    ui->CreateSingleButton(950, 0, 250, 50, "DECORATIONS", 20, 21);
+    ui->CreateSingleButton(50, 0, 250, 50, "TERRAIN", 26, 27,true);
+    ui->CreateSingleButton(350, 0, 250, 50, "MOBS", 29, 30, true);
+    ui->CreateSingleButton(650, 0, 250, 50, "EQUIPMENT", 20, 21, true);
+    ui->CreateSingleButton(950, 0, 250, 50, "DECORATIONS", 20, 21, true);
 
-    ui->CreateSingleButton(1150, 100, 200, 50, "CLOSE", 20, 21);
-    ui->CreateSingleButton(50, 100, 200, 50, "RESET", 20, 21);
-    ui->CreateSingleButton(50, 200, 200, 50, "CREATE", 20, 21);
-    ui->CreateSingleButton(50, 300, 200, 50, "LOAD", 20, 21);
+    ui->CreateSingleButton(1150, 100, 200, 50, "CLOSE", 20, 21, true);
+    ui->CreateSingleButton(50, 100, 200, 50, "RESET", 20, 21, true);
+    ui->CreateSingleButton(50, 200, 200, 50, "CREATE", 20, 21, true);
+    ui->CreateSingleButton(50, 300, 200, 50, "LOAD", 20, 21, true);
 }
 
 void LoadHelper(std::vector<PleacedObject>& vector, std::string directory, SDL_Renderer* renderer) {

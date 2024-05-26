@@ -22,6 +22,7 @@ class Button {
         std::string text;
         int textSize;
         int textStep;
+        bool predefinedSize = true;
 
     public:
         std::string GetText();
@@ -32,6 +33,8 @@ class Button {
         void SetTextSize(int temp);
         int GetTextStep();
         void SetTextStep(int temp);
+        bool GetPredefinedSize();
+        void SetPredefinedSize(bool temp);
 
 };
 
@@ -57,6 +60,8 @@ class UI
         int menuType = 0;
         int score = 0;
 
+        std::string scoreFilePath = "Data/HighScores/level1_score.txt";
+
     public:
         Font* font;
 
@@ -70,6 +75,8 @@ class UI
         void SetTextureButtonInfo(SDL_Texture* temptex);
         int GetScore();
         void SetScore(int temp);
+        std::string GetScorePath();
+        void SetScorePath(std::string temp);
 
         std::vector<Hearth> &getHP();
         void CreateHearths();
@@ -78,7 +85,7 @@ class UI
 
         void CreateButton();
 
-        void CreateSingleButton(int x, int y, int w, int h, std::string text, int textSize, int textStep);
+        void CreateSingleButton(int x, int y, int w, int h, std::string text, int textSize, int textStep, bool sizePredefined);
 
         void CreateButtonInfo(int x, int y, int w, int h, std::string text, int textSize, int textStep);
 
@@ -88,6 +95,8 @@ class UI
         void RenderButton();
 
         void RenderSingleButton(int index, int textureType);
+
+        void CreateScoreButton();
 
         void OnClick(SDL_Event event);
 

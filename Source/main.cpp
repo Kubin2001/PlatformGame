@@ -10,13 +10,6 @@ int windowWidth = 1400;
 int windowHeight = 800;
 std::string levelName = "Levels/level1.txt";
 
-SDL_Texture* load(const char* file, SDL_Renderer* ren) {
-	SDL_Surface* tmpSurface = IMG_Load(file);
-	SDL_Texture* tex = SDL_CreateTextureFromSurface(ren, tmpSurface);
-	SDL_FreeSurface(tmpSurface);
-	return tex;
-}
-
 int main(int argv, char* argc[])
 {
 	srand(static_cast<unsigned int>(time(nullptr)));

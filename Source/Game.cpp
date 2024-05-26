@@ -3,6 +3,7 @@
 #include "SDL_image.h"
 #include "SDL_mixer.h"
 #include "SoundManager.h"
+#include "TextureManager.h"
 
 #include "Game.h"
 
@@ -11,7 +12,6 @@ extern int localWindow;
 extern bool status;
 extern int windowWidth;
 extern int windowHeight;
-extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
 
 Game::Game() {
     window = nullptr;

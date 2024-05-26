@@ -13,7 +13,6 @@
 #include "TextureManager.h"
 
 extern std::string levelName;
-extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
 
 //Top Objects
 
@@ -81,26 +80,8 @@ std::vector<Texture>& Collectables::getTextures() {
 //Getters and setters
 
 void Collectables::LoadTextures() {
-	Texture temp;
 	std::string directory = "Textures/Collectables";
-	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory)) {
-		if (entry.path().extension() == ".png") {
-			std::string pathString = entry.path().string();
-			const char* path = pathString.c_str();
-			Textures.push_back(temp);
-			Textures[Textures.size() - 1].SetTexture(load(path, renderer));
-			std::string temp = "";
-			for (size_t i = directory.length(); i < pathString.length(); i++)
-			{
-				if (pathString[i + 1] == '.') {
-					break;
-				}
-				temp += pathString[i + 1];
-			}
-			Textures[Textures.size() - 1].SetName(temp);
-			temp = "";
-		}
-	}
+	LoadMultipleTextures(Textures, directory, renderer);
 }
 
 void LoadObject(std::vector<CollectableWeapon*>& vec1, Texture& texture, std::ifstream& levelFile, std::string& line) {
@@ -137,28 +118,28 @@ void Collectables::LoadEquipment() {
 		while (getline(levelFile, line)) {
 			if (line == "shortSword") {
 				Weapons.push_back(new ShortSword());
-				for (int i = 0; i < Textures.size(); i++)
+				for (auto& it : Textures)
 				{
-					if (Textures[i].GetName() == line) {
-						LoadObject(Weapons, Textures[i], levelFile, line);
+					if (it.GetName() == line) {
+						LoadObject(Weapons, it, levelFile, line);
 					}
 				}
 			}
 			else if (line == "coin") {
 				Pickables.push_back(new Point());
-				for (int i = 0; i < Textures.size(); i++)
+				for (auto& it : Textures)
 				{
-					if (Textures[i].GetName() == line) {
-						LoadObject(Pickables, Textures[i], levelFile, line);
+					if (it.GetName() == line) {
+						LoadObject(Pickables, it, levelFile, line);
 					}
 				}
 			}
 			else if (line == "medKit") {
 				Pickables.push_back(new MedKit());
-				for (int i = 0; i < Textures.size(); i++)
+				for (auto& it : Textures)
 				{
-					if (Textures[i].GetName() == line) {
-						LoadObject(Pickables, Textures[i], levelFile, line);
+					if (it.GetName() == line) {
+						LoadObject(Pickables, it, levelFile, line);
 					}
 				}
 			}

@@ -14,8 +14,6 @@
 
 extern std::string levelName;
 
-extern SDL_Texture* load(const char* file, SDL_Renderer* ren);
-
 Mobs::Mobs(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 }
@@ -356,38 +354,20 @@ std::vector<Enemy*>& Mobs::getEnemies() { return Enemies; }
 
 
 void Mobs::LoadTextures() {
-	Texture temp;
 	std::string directory = "Textures/Mobs";
-	for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(directory)) {
-		if (entry.path().extension() == ".png") {
-			std::string pathString = entry.path().string();
-			const char* path = pathString.c_str();
-			Textures.push_back(temp);
-			Textures[Textures.size() - 1].SetTexture(load(path, renderer));
-			std::string temp = "";
-			for (size_t i = directory.length(); i < pathString.length(); i++)
-			{
-				if (pathString[i + 1] == '.') {
-					break;
-				}
-				temp += pathString[i + 1];
-			}
-			Textures[Textures.size() - 1].SetName(temp);
-			temp = "";
-		}
-	}
+	LoadMultipleTextures(Textures, directory, renderer);
 }
 
 void LoadObject(std::vector<Enemy*>& vec1, Texture& texture, std::ifstream& levelFile, std::string& line) {
-	vec1[vec1.size() - 1]->setTexture(texture.GetTexture());
+	vec1.back()->setTexture(texture.GetTexture());
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->x = std::stoi(line);
+	vec1.back()->GetRectangle()->x = std::stoi(line);
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->y = std::stoi(line);
+	vec1.back()->GetRectangle()->y = std::stoi(line);
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->w = std::stoi(line);
+	vec1.back()->GetRectangle()->w = std::stoi(line);
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->h = std::stoi(line);
+	vec1.back()->GetRectangle()->h = std::stoi(line);
 }
 
 void Mobs::LoadMobs() {
@@ -397,19 +377,19 @@ void Mobs::LoadMobs() {
 		while (getline(levelFile, line)) {
 			if (line == "charger") {
 				Enemies.push_back(new Charger());
-				for (int i = 0; i < Textures.size(); i++)
+				for (auto &it: Textures)
 				{
-					if (Textures[i].GetName() == line) {
-						LoadObject(Enemies, Textures[i], levelFile, line);
+					if (it.GetName() == line) {
+						LoadObject(Enemies, it, levelFile, line);
 					}
 				}
 			}
 			else if (line == "wolf") {
 				Enemies.push_back(new Wolf());
-				for (int i = 0; i < Textures.size(); i++)
+				for (auto& it : Textures)
 				{
-					if (Textures[i].GetName() == line) {
-						LoadObject(Enemies, Textures[i], levelFile, line);
+					if (it.GetName() == line) {
+						LoadObject(Enemies, it, levelFile, line);
 					}
 				}
 			}
@@ -420,7 +400,7 @@ void Mobs::LoadMobs() {
 				{
 					if (Textures[i].GetName() == line) {
 						LoadObject(Enemies, Textures[i], levelFile, line);
-						Enemies[Enemies.size() - 1]->LoadAnimations(41);
+						Enemies.back()->LoadAnimations(41);
 					}
 				}
 

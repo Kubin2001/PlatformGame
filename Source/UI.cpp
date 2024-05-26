@@ -8,6 +8,8 @@
 
 extern int windowtype;
 extern int localWindow;
+extern int windowWidth;
+extern int windowHeight;
 extern std::string levelName;
 
 UI::UI(SDL_Renderer *renderer){
@@ -38,13 +40,35 @@ void UI::SetScore(int temp) {
     score = temp;
 }
 
+
+std::string UI::GetScorePath() {
+    return scoreFilePath;
+}
+void UI::SetScorePath(std::string temp) {
+    scoreFilePath = temp;
+}
+
 void UI::Render() {
     if (windowtype == 1) {
         RenderButton();
         for (size_t  i = 0; i < Buttons.size(); i++)
         {
-            int size = Buttons[i].GetRectangle()->w / Buttons[i].GetText().length() - 2;
-            font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, size, size, size + 2);
+            switch (Buttons[i].GetPredefinedSize())
+            {
+                 case 0:{
+                    int size = Buttons[i].GetRectangle()->w / Buttons[i].GetText().length() - 2;
+                    font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y, size, size, size + 2);
+                    break;
+                 }
+
+                 case 1:{
+                    font->RenderText(renderer, Buttons[i].GetText(), Buttons[i].GetRectangle()->x, Buttons[i].GetRectangle()->y,
+                        Buttons[i].GetTextSize(), Buttons[i].GetTextSize(), Buttons[i].GetTextStep());
+                    break;
+                 }
+
+            }
+            
         }
     }
     else if (windowtype == 2) {
@@ -120,7 +144,7 @@ void UI::CreateButton() {
             for (int i = 0; i < 4; i++)
             {
                 std::getline(levelFile, line);
-                CreateSingleButton(xPos, yPos, 200, 50, line, 29, 30);
+                CreateSingleButton(xPos, yPos, 200, 50, line, 29, 30,false);
                 yPos += 150;
             }
         }
@@ -133,7 +157,7 @@ void UI::CreateButton() {
             for (int i = 0; i < 11; i++)
             {
                 std::getline(levelFile, line);
-                CreateSingleButton(xPos, yPos, 200, 100, line, 29, 30);
+                CreateSingleButton(xPos, yPos, 200, 100, line, 29, 30, false);
                 xPos += 250;
                 if (i == 4) {
                     xPos = 100;
@@ -148,14 +172,14 @@ void UI::CreateButton() {
         }
             break;
         case 2: { //Player Levels Selector 
-            std::ifstream levelFile("Data/menu_player_levels.txt");
+            std::ifstream levelFile("Data/menu_player_high_scores.txt");
             std::string line;
             xPos = 100;
             yPos = 200;
             for (int i = 0; i < 11; i++)
             {
                 std::getline(levelFile, line);
-                CreateSingleButton(xPos, yPos, 200, 100, line, 29, 30);
+                CreateSingleButton(xPos, yPos, 200, 100, line, 29, 30,false);
                 xPos += 250;
                 if (i == 4) {
                     xPos = 100;
@@ -169,19 +193,26 @@ void UI::CreateButton() {
             }
         }
            break;
+
+        case 3: { //Score Button
+            CreateScoreButton();
+            CreateSingleButton(650, 500, 100, 40, "BACK", 29, 30, false);
+        }
+          break;
     }
 }
 
-void UI::CreateSingleButton(int x, int y, int w, int h, std::string text, int textSize, int textStep) {
+void UI::CreateSingleButton(int x, int y, int w, int h, std::string text, int textSize, int textStep,bool sizePredefined) {
     Button button;
     Buttons.push_back(button);
-    Buttons[Buttons.size() -1].GetRectangle()->x = x;
-    Buttons[Buttons.size() - 1].GetRectangle()->y = y;
-    Buttons[Buttons.size() - 1].GetRectangle()->w = w;
-    Buttons[Buttons.size() - 1].GetRectangle()->h = h;
-    Buttons[Buttons.size() - 1].SetText(text);
-    Buttons[Buttons.size() - 1].SetTextSize(textSize);
-    Buttons[Buttons.size() - 1].SetTextStep(textStep);
+    Buttons.back().GetRectangle()->x = x;
+    Buttons.back().GetRectangle()->y = y;
+    Buttons.back().GetRectangle()->w = w;
+    Buttons.back().GetRectangle()->h = h;
+    Buttons.back().SetText(text);
+    Buttons.back().SetTextSize(textSize);
+    Buttons.back().SetTextStep(textStep);
+    Buttons.back().SetPredefinedSize(sizePredefined);
 }
 
 void UI::RenderSingleButton(int index, int textureType) {
@@ -211,6 +242,27 @@ void UI::CreateButtonInfo(int x, int y , int w, int h,std::string text,int textS
     SDL_RenderCopy(renderer, textureButtonInfo, NULL, buttonInfo->GetRectangle());
     font->RenderText(renderer, buttonInfo->GetText(), buttonInfo->GetRectangle()->x, buttonInfo->GetRectangle()->y, textSize, textSize, textStep);
     SDL_RenderPresent(renderer);
+}
+
+void UI::CreateScoreButton() {
+    std::ifstream scoreFile(scoreFilePath);
+    std::string line = "";
+    int counter = 1;
+    std::string fullText = " HIGH SCORE/";
+    if (scoreFile.is_open()) {
+        while (getline(scoreFile, line)) {
+            if (counter == 1) {
+                fullText += "    " + std::to_string(counter) + ":" + line + "/" + "\n";
+            }
+            else
+            {
+                fullText += "   " + std::to_string(counter) + ":" + line + "/" + "\n";
+            }
+            counter++;
+        }
+    }
+    scoreFile.close();
+    CreateSingleButton(500, 20, 350, 350, fullText, 30, 32,true);
 }
 
 void UI::OnClick(SDL_Event event) {
@@ -244,42 +296,112 @@ void UI::OnClick(SDL_Event event) {
                 if (SimpleCollision(mouse, *Buttons[0].GetRectangle()) == 1) {
                     levelName = "Levels/level1.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[1].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[1].GetRectangle()) == 1) {
                     levelName = "Levels/level2.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[2].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[2].GetRectangle()) == 1) {
                     levelName = "Levels/level3.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[3].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[3].GetRectangle()) == 1) {
                     levelName = "Levels/level4.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[4].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[4].GetRectangle()) == 1) {
                     levelName = "Levels/level5.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[5].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[5].GetRectangle()) == 1) {
                     levelName = "Levels/level6.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[6].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[6].GetRectangle()) == 1) {
                     levelName = "Levels/level7.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[7].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[7].GetRectangle()) == 1) {
                     levelName = "Levels/level8.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[8].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[8].GetRectangle()) == 1) {
                     levelName = "Levels/level9.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[9].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[9].GetRectangle()) == 1) {
                     levelName = "Levels/level10.txt";
                 }
-                if (SimpleCollision(mouse, *Buttons[10].GetRectangle()) == 1) {
+                else if (SimpleCollision(mouse, *Buttons[10].GetRectangle()) == 1) {
                     menuType = 0;
                     Buttons.clear();
                     CreateButton();
                 }
                 break;
             case 2:
-                if (SimpleCollision(mouse, *Buttons[10].GetRectangle()) == 1) {
+                if (SimpleCollision(mouse, *Buttons[0].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level1_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[1].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level2_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[2].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level3_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[3].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level4_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[4].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level5_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[5].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level6_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[6].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level7_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[7].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level8_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[8].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level9_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[9].GetRectangle()) == 1) {
+                    menuType = 3;
+                    Buttons.clear();
+                    scoreFilePath = "Data/HighScores/level10_score.txt";
+                    CreateButton();
+                }
+                else if (SimpleCollision(mouse, *Buttons[10].GetRectangle()) == 1) {
                     menuType = 0;
+                    Buttons.clear();
+                    CreateButton();
+                }
+                break;
+
+            case 3:
+                if (SimpleCollision(mouse, *Buttons[0].GetRectangle()) == 1) {
+                }
+                else if (SimpleCollision(mouse, *Buttons[1].GetRectangle()) == 1) {
+                    menuType = 2;
                     Buttons.clear();
                     CreateButton();
                 }
@@ -333,6 +455,13 @@ int Button::GetTextStep() {
 }
 void Button::SetTextStep(int temp) {
     textStep = temp;
+}
+
+bool Button::GetPredefinedSize() {
+    return predefinedSize;
+}
+void Button::SetPredefinedSize(bool temp) {
+    predefinedSize = temp;
 }
 
 SDL_Rect* ButtonInfo::GetRectangle() {
