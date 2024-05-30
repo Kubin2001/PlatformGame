@@ -12,6 +12,7 @@ extern int localWindow;
 extern bool status;
 extern int windowWidth;
 extern int windowHeight;
+extern long long int framesCounter;
 
 Game::Game() {
     window = nullptr;
@@ -81,9 +82,9 @@ void Game::LoadTextures() {
         break;
     case 2:
         player->SetTexture(load("Textures/player.png", renderer));
-        particlesManager->SetTexture(load("Textures/Particles/wave.png", renderer));
         map->LoadTextures();
         mobs->LoadTextures();
+        particlesManager->LoadTextures();
         ui->SetTextureHearth(load("Textures/Interface/hearth.png", renderer));
         ui->font->SetTexture(load("Textures/Interface/font.png", renderer));
         collectables->LoadTextures();

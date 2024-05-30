@@ -2,25 +2,24 @@
 #include <SDL.h>
 #include "ParticlesManager.h"
 #include "SoundManager.h"
+#include "TextureManager.h"
 
 ParticlesManager::ParticlesManager(SDL_Renderer * renderer) {
     this->renderer = renderer;
 }
 
 //Getteers and setters
-SDL_Texture* ParticlesManager::GetTexture() {
-    return textureWayve;
-}
-
-void ParticlesManager::SetTexture(SDL_Texture * temptex) {
-    textureWayve = temptex;
-}
-
 
 SDL_Rect* Particle::GetRectangle() {
     return &rectangle;
 }
 
+SDL_Texture* Particle::GetTexture() {
+    return texture;
+}
+void Particle::SetTexture(SDL_Texture* temptex) {
+    texture = temptex;
+}
 
 int Particle::GetDirection() {
     return direction;
@@ -29,11 +28,25 @@ void Particle::SetDirection(int temp) {
     direction = temp;
 }
 
-int Particle::GetSpeed() {
-    return speed;
+int Particle::GetSpeedX() {
+    return speedX;
 }
-void Particle::SetSpeed(int temp) {
-    speed = temp;
+void Particle::SetSpeedX(int temp) {
+    speedX = temp;
+}
+
+int Particle::GetSpeedY() {
+    return speedY;
+}
+void Particle::SetSpeedY(int temp) {
+    speedY = temp;
+}
+
+double Particle::GetAngle() {
+    return angle;
+}
+void Particle::SetAngle(double temp) {
+    angle = temp;
 }
 int Particle::GetLifeTime() {
     return lifeTime;
@@ -47,52 +60,73 @@ bool Particle::GetRenderable() { return renderable; }
 void Particle::SetRenderable(bool temp) { renderable = temp; }
 //Getteers and setters
 
+//Particles Functions
+void Particle::Move() {
+    GetRectangle()->x += speedX;
+    GetRectangle()->y += speedY;
+}
+//
+
+void ParticlesManager::LoadTextures() {
+    std::string directory = "Textures/Particles";
+    LoadMultipleTextures(Textures, directory, renderer);
+}
+
 void ParticlesManager::Render(SDL_Rect camRect) {
     SDL_Rect temp;
-    SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-    for (int i = 0; i < PlayerAttackParticles.size(); i++) {
-        if (PlayerAttackParticles[i].GetRenderable()) {
-            temp.x = PlayerAttackParticles[i].GetRectangle()->x - camRect.x;
-            temp.y = PlayerAttackParticles[i].GetRectangle()->y - camRect.y;
-            temp.w = PlayerAttackParticles[i].GetRectangle()->w;
-            temp.h = PlayerAttackParticles[i].GetRectangle()->h;
-            switch (PlayerAttackParticles[i].GetDirection()) {
+    for (int i = 0; i < PlayerParticles.size(); i++) {
+        if (PlayerParticles[i].GetRenderable()) {
+            temp.x = PlayerParticles[i].GetRectangle()->x - camRect.x;
+            temp.y = PlayerParticles[i].GetRectangle()->y - camRect.y;
+            temp.w = PlayerParticles[i].GetRectangle()->w;
+            temp.h = PlayerParticles[i].GetRectangle()->h;
+            switch (PlayerParticles[i].GetDirection()) {
             case 1:
-                SDL_RenderCopy(renderer, textureWayve, NULL, &temp);
+                SDL_RenderCopyEx(renderer, PlayerParticles[i].GetTexture(), NULL, &temp, PlayerParticles[i].GetAngle(), NULL, SDL_FLIP_NONE);
                 break;
             case 2:
-                SDL_RenderCopyEx(renderer, textureWayve, NULL, &temp, 0.0, NULL, flip);
+                SDL_RenderCopyEx(renderer, PlayerParticles[i].GetTexture(), NULL, &temp, PlayerParticles[i].GetAngle(), NULL, SDL_FLIP_HORIZONTAL);
                 break;
             }
         }
     }
 
-    for (int i = 0; i < EnemyAttackParticles.size(); i++) {
-        if (EnemyAttackParticles[i].GetRenderable()) {
-            temp.x = EnemyAttackParticles[i].GetRectangle()->x - camRect.x;
-            temp.y = EnemyAttackParticles[i].GetRectangle()->y - camRect.y;
-            temp.w = EnemyAttackParticles[i].GetRectangle()->w;
-            temp.h = EnemyAttackParticles[i].GetRectangle()->h;
-            switch (EnemyAttackParticles[i].GetDirection()) {
+    for (int i = 0; i < EnemyParticles.size(); i++) {
+        if (EnemyParticles[i].GetRenderable()) {
+            temp.x = EnemyParticles[i].GetRectangle()->x - camRect.x;
+            temp.y = EnemyParticles[i].GetRectangle()->y - camRect.y;
+            temp.w = EnemyParticles[i].GetRectangle()->w;
+            temp.h = EnemyParticles[i].GetRectangle()->h;
+            switch (EnemyParticles[i].GetDirection()) {
             case 1:
-                SDL_RenderCopy(renderer, textureWayve, NULL, &temp);
+                SDL_RenderCopyEx(renderer, EnemyParticles[i].GetTexture(), NULL, &temp, EnemyParticles[i].GetAngle(), NULL, SDL_FLIP_NONE);
                 break;
             case 2:
-                SDL_RenderCopyEx(renderer, textureWayve, NULL, &temp, 0.0, NULL, flip);
+                SDL_RenderCopyEx(renderer, EnemyParticles[i].GetTexture(), NULL, &temp, EnemyParticles[i].GetAngle(), NULL, SDL_FLIP_HORIZONTAL);
                 break;
             }
         }
     }
 }
 
-void ParticlesManager::CreatePlayerAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime) {
-    PlayerAttackParticle temp(rect,direction,speed,lifeTime);
-    PlayerAttackParticles.push_back(temp);
+void ParticlesManager::CreatePlayerParticle(SDL_Rect rect, int direction, int speedX, int speedY, int lifeTime, std::string textureName, double angle) {
+    PlayerParticle temp(rect,direction,speedX,speedY,lifeTime,angle);
+    for (auto& it : Textures) {
+        if (textureName == it.GetName()) {
+            temp.SetTexture(it.GetTexture());
+        }
+    }
+    PlayerParticles.push_back(temp);
 }
 
-void ParticlesManager::CreateEnemyAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime) {
-    EnemyAttackParticle temp(rect,direction,speed,lifeTime);
-    EnemyAttackParticles.push_back(temp);
+void ParticlesManager::CreateEnemyParticle(SDL_Rect rect, int direction, int speedX, int speedY, int lifeTime, std::string textureName, double angle) {
+    EnemyParticle temp(rect,direction,speedX,speedY,lifeTime,angle);
+    for (auto& it : Textures) {
+        if (textureName == it.GetName()) {
+            temp.SetTexture(it.GetTexture());
+        }
+    }
+    EnemyParticles.push_back(temp);
 }
 
 void ParticlesManager::CheckColision(Mobs* mobs, Player* player, SDL_Rect camRect) {
@@ -101,62 +135,56 @@ void ParticlesManager::CheckColision(Mobs* mobs, Player* player, SDL_Rect camRec
 }
 
 void ParticlesManager::CheckColisionMobs(Mobs* mobs,SDL_Rect camRect) {
-    for (int i = 0; i < PlayerAttackParticles.size(); i++)
+    for (int i = 0; i < PlayerParticles.size(); i++)
     {
-        if (SimpleCollision(camRect, *PlayerAttackParticles[i].GetRectangle())) {
-            PlayerAttackParticles[i].SetRenderable(true);
-        }
-        else
-        {
-            PlayerAttackParticles[i].SetRenderable(false);
-        }
-    }
-    for (int i = 0; i < PlayerAttackParticles.size(); i++)
-    {
-        for (int j = 0; j < mobs->getEnemies().size(); j++)
-        {
-            if (mobs->getEnemies()[j]->getInvTime() < 1) {
-                if (SimpleCollision(*PlayerAttackParticles[i].GetRectangle(), *mobs->getEnemies()[j]->GetRectangle())) {
-                    mobs->getEnemies()[j]->setHitPoints(mobs->getEnemies()[j]->getHitPoints() - 10);
-                    mobs->getEnemies()[j]->setInvTime(20);
-                    mobs->getEnemies()[j]->MakeAgressive();
-                    PlayerAttackParticles[i].SetLifeTime(0);
+        if (SimpleCollision(camRect, *PlayerParticles[i].GetRectangle())) {
+            PlayerParticles[i].SetRenderable(true);
+            for (int j = 0; j < mobs->getEnemies().size(); j++)
+            {
+                if (mobs->getEnemies()[j]->getInvTime() < 1) {
+                    if (SimpleCollision(*PlayerParticles[i].GetRectangle(), *mobs->getEnemies()[j]->GetRectangle())) {
+                        mobs->getEnemies()[j]->setHitPoints(mobs->getEnemies()[j]->getHitPoints() - 10);
+                        mobs->getEnemies()[j]->setInvTime(20);
+                        mobs->getEnemies()[j]->MakeAgressive();
+                        PlayerParticles[i].SetLifeTime(0);
+                    }
                 }
             }
         }
-    };
+        else
+        {
+            PlayerParticles[i].SetRenderable(false);
+        }
+    }
 }
 
 void ParticlesManager::CheckColisionPlayer(Player * player, SDL_Rect camRect) {
-    for (int i = 0; i < EnemyAttackParticles.size(); i++)
+    for (int i = 0; i < EnemyParticles.size(); i++)
     {
-        if (SimpleCollision(camRect, *EnemyAttackParticles[i].GetRectangle())) {
-            EnemyAttackParticles[i].SetRenderable(true);
+        if (SimpleCollision(camRect, *EnemyParticles[i].GetRectangle())) {
+            EnemyParticles[i].SetRenderable(true);
+            if (SimpleCollision(*EnemyParticles[i].GetRectangle(), *player->GetRectangle())) {
+                player->SetDamage(true);
+            }
         }
         else
         {
-            EnemyAttackParticles[i].SetRenderable(false);
+            EnemyParticles[i].SetRenderable(false);
         }
-    }
-    for (int i = 0; i < EnemyAttackParticles.size(); i++)
-    {
-        if (SimpleCollision(*EnemyAttackParticles[i].GetRectangle(), *player->GetRectangle())) {
-            player->SetDamage(true);
-        }           
     }
 }
 
 void ParticlesManager::EndLifeTime() {
-    for (int i = 0; i < PlayerAttackParticles.size(); i++) {
-        PlayerAttackParticles[i].SetLifeTime(PlayerAttackParticles[i].GetLifeTime()- 1);
-        if (PlayerAttackParticles[i].GetLifeTime() < 1) {
-            PlayerAttackParticles.erase(PlayerAttackParticles.begin() + i);
+    for (int i = 0; i < PlayerParticles.size(); i++) {
+        PlayerParticles[i].SetLifeTime(PlayerParticles[i].GetLifeTime()- 1);
+        if (PlayerParticles[i].GetLifeTime() < 1) {
+            PlayerParticles.erase(PlayerParticles.begin() + i);
         }
     }
-    for (int i = 0; i < EnemyAttackParticles.size(); i++) {
-        EnemyAttackParticles[i].SetLifeTime(EnemyAttackParticles[i].GetLifeTime() - 1);
-        if (EnemyAttackParticles[i].GetLifeTime() < 1) {
-            EnemyAttackParticles.erase(EnemyAttackParticles.begin() + i);
+    for (int i = 0; i < EnemyParticles.size(); i++) {
+        EnemyParticles[i].SetLifeTime(EnemyParticles[i].GetLifeTime() - 1);
+        if (EnemyParticles[i].GetLifeTime() < 1) {
+            EnemyParticles.erase(EnemyParticles.begin() + i);
         }
     }
 }
@@ -167,28 +195,32 @@ void ParticlesManager::MoveParticles(const Uint8* state, Player* player) {
 }
 
 void ParticlesManager::MoveParticlesPlayer(const Uint8* state, Player* player) {
-    if (PlayerAttackParticles.empty()) {
+    if (PlayerParticles.empty()) {
         return;
     }
-    for (int i = 0; i < PlayerAttackParticles.size(); i++)
+    for (auto &particle: PlayerParticles)
     {
-        PlayerAttackParticles[i].GetRectangle()->x += PlayerAttackParticles[i].GetSpeed();
+        particle.Move();
     }
 }
 
 void ParticlesManager::MoveParticlesEnemy(const Uint8* state, Player* player) {
-    if (EnemyAttackParticles.empty()) {
+    if (EnemyParticles.empty()) {
         return;
     }
-    for (int i = 0; i < EnemyAttackParticles.size(); i++)
+    for (int i = 0; i < EnemyParticles.size(); i++)
     {
-        EnemyAttackParticles[i].GetRectangle()->x += EnemyAttackParticles[i].GetSpeed();
+        EnemyParticles[i].Move();
     }
 }
 
 
 
 ParticlesManager::~ParticlesManager() {
-    SDL_DestroyTexture(textureWayve);
+    for (auto &it:Textures)
+    {
+        SDL_DestroyTexture(it.GetTexture());
+    }
+
 }
 

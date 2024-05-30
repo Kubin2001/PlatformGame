@@ -19,6 +19,7 @@ class SoundManager
         static Mix_Chunk* soundGrowl;
         static Mix_Chunk* soundDeath;
         static Mix_Chunk* soundPirateAttack;
+        static Mix_Chunk* soundArrowShoot;
         //Mobs
         //Collectables
         static Mix_Chunk* soundCoin;
@@ -49,6 +50,8 @@ class SoundManager
         static void PlayWolfGrowlSound();
 
         static void PlayPirateAttackSound();
+
+        static void PlayArrowShootSound();
 
         static void PlayCoinSound();
 

@@ -6,10 +6,12 @@
 #include "UI.h"
 #include "Camera.h"
 #include "TextureManager.h"
+#include "ParticlesManager.h"
 
 class Player;
 
 class Enemy;
+
 
 class Object {
 	protected:

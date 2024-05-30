@@ -4,6 +4,7 @@
 #include <vector>   
 #include "Mobs.h"
 #include "Player.h"
+#include "TextureManager.h"
 
 class Mobs;
 
@@ -12,42 +13,54 @@ class Player;
 class Particle {
     protected:
         SDL_Rect rectangle;
+        SDL_Texture* texture;
         int direction = 1;
-        int speed = 0;
+        int speedX = 0;
+        int speedY = 0;
+        double angle = 0;
         int lifeTime = 0;
         bool renderable = false;
     public:
-        SDL_Rect* GetRectangle();
-        int GetDirection();
-        void SetDirection(int temp);
-        int GetSpeed();
-        void SetSpeed(int temp);
-        int GetLifeTime();
-        void SetLifeTime(int temp);
-
-        bool GetRenderable();
-
-        void SetRenderable(bool temp);
+        virtual SDL_Rect* GetRectangle();
+        virtual SDL_Texture* GetTexture();
+        virtual void SetTexture(SDL_Texture *temptex);
+        virtual int GetDirection();
+        virtual void SetDirection(int temp);
+        virtual int GetSpeedX();
+        virtual void SetSpeedX(int temp);
+        virtual int GetSpeedY();
+        virtual void SetSpeedY(int temp);
+        virtual double GetAngle();
+        virtual void SetAngle(double temp);
+        virtual int GetLifeTime();
+        virtual void SetLifeTime(int temp);
+        virtual bool GetRenderable();
+        virtual void SetRenderable(bool temp);
+        virtual void Move();
 
 };
 
-class EnemyAttackParticle : public Particle {
+class EnemyParticle : public Particle {
     public:
-        EnemyAttackParticle(SDL_Rect rect, int direction, int speed, int lifeTime) {
+        EnemyParticle(SDL_Rect rect, int direction, int speedX,int speedY, int lifeTime, double angle) {
             this->direction = direction;
-            this->speed = speed;
+            this->speedX = speedX;
+            this->speedY = speedY;
             this->lifeTime = lifeTime;
+            this->angle = angle;
             this->rectangle = rect;
         }
 };
 
 
-class PlayerAttackParticle : public Particle {
+class PlayerParticle : public Particle {
     public:
-        PlayerAttackParticle(SDL_Rect rect, int direction, int speed, int lifeTime) {
+        PlayerParticle(SDL_Rect rect, int direction, int speedX, int speedY, int lifeTime, double angle) {
             this->direction = direction;
-            this->speed = speed;
+            this->speedX = speedX;
+            this->speedY = speedY;
             this->lifeTime = lifeTime;
+            this->angle = angle;
             this->rectangle = rect;
         }
 };
@@ -56,22 +69,20 @@ class ParticlesManager
 {
     private:
         SDL_Renderer* renderer;
-        SDL_Texture * textureWayve = nullptr;
-        std::vector<PlayerAttackParticle> PlayerAttackParticles;
-        std::vector<EnemyAttackParticle> EnemyAttackParticles;
+        std::vector<Texture> Textures;
+        std::vector<PlayerParticle> PlayerParticles;
+        std::vector<EnemyParticle> EnemyParticles;
 
     public:
         ParticlesManager(SDL_Renderer* renderer);
-
-        SDL_Texture *GetTexture();
-
-        void SetTexture(SDL_Texture* temptex);
+        
+        void LoadTextures();
 
         void Render(SDL_Rect camRect);
 
-        void CreatePlayerAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime);
+        void CreatePlayerParticle(SDL_Rect rect, int direction, int speedX, int speedY, int lifeTime, std::string textureName, double angle);
 
-        void CreateEnemyAttackParticles(SDL_Rect rect, int direction, int speed, int lifeTime);
+        void CreateEnemyParticle(SDL_Rect rect, int direction, int speedX, int speedY, int lifeTime, std::string textureName, double angle);
 
         void CheckColision(Mobs* mobs,Player* player, SDL_Rect camRect);
 

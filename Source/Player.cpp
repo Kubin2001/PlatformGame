@@ -303,11 +303,11 @@ void Player::Attack(const Uint8* state, ParticlesManager* particleManager) {
 				weapon->SetAnimation(2);
 				SDL_Rect rect{ weapon->GetRectangle()->x ,GetRectangle()->y ,30,80 };
 				if (animation == 1) {
-					particleManager->CreatePlayerAttackParticles(rect, 1, 8, 40);
+					particleManager->CreatePlayerParticle(rect, 1, 8, 0, 40, "wave",0);
 				}
 				else
 				{
-					particleManager->CreatePlayerAttackParticles(rect, 2, -8, 40);
+					particleManager->CreatePlayerParticle(rect, 2, -8, 0, 40, "wave",0);
 				}
 				if (!colision[1]) {
 					JumpBuffer += 20;

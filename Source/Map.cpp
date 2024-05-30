@@ -10,11 +10,13 @@
 #include "Camera.h"
 #include "SoundManager.h"
 #include "TextureManager.h"
+#include "ParticlesManager.h"
 
 extern int windowtype;
 extern int localWindow;
 extern std::string levelName;
 extern std::string scoreLevel;
+extern long long int framesCounter;
 
 //Top Objects
 
@@ -166,15 +168,15 @@ void Map::LoadTextures() {
 }
 
 void LoadObject(std::vector<Object*>& vec1, Texture& texture,std::ifstream &levelFile,std::string &line) {
-	vec1[vec1.size() - 1]->SetTexture(texture.GetTexture());
+	vec1.back()->SetTexture(texture.GetTexture());
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->x = std::stoi(line);
+	vec1.back()->GetRectangle()->x = std::stoi(line);
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->y = std::stoi(line);
+	vec1.back()->GetRectangle()->y = std::stoi(line);
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->w = std::stoi(line);
+	vec1.back()->GetRectangle()->w = std::stoi(line);
 	getline(levelFile, line);
-	vec1[vec1.size() - 1]->GetRectangle()->h = std::stoi(line);
+	vec1.back()->GetRectangle()->h = std::stoi(line);
 }
 
 void Map::CreateLevel() {

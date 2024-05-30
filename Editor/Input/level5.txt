@@ -8,8 +8,8 @@ platform3
 725
 778
 40
-shootter
-908
-684
+archer
+308
+650
 40
-40
+80

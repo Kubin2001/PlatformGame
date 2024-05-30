@@ -10,6 +10,7 @@ int windowWidth = 1400;
 int windowHeight = 800;
 std::string levelName = "Levels/level1.txt";
 std::string scoreLevel = "Data/HighScores/level1_score.txt";
+long long int framesCounter = 0;
 
 int main(int argv, char* argc[])
 {

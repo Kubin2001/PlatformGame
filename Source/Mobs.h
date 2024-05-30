@@ -95,7 +95,6 @@ class Wolf : public Enemy {
 private:
 	CollisonProjectile* cProj;
 	int agroo = 0;
-	static int wolfCount; 
 
 public:
 	Wolf() {
@@ -140,6 +139,50 @@ class Pirate : public Enemy {
 		~Pirate() {
 			delete cProj;
 			cProj = nullptr;
+		}
+};
+
+class Archer : public Enemy {
+	private:
+		CollisonProjectile* cProj;
+		bool isAggressive = false;
+		int AttackDelay = 0;
+		int agroo = 0;
+
+	public:
+		Archer() {
+			hitPoints = 20;
+			animationCount = 4;
+			animationTimer = 0;
+		}
+
+		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		SDL_Rect* ChooseAnimation()override;
+
+		void MakeAgressive()override;
+
+		~Archer() {
+			delete cProj;
+			cProj = nullptr;
+		}
+};
+
+class Shotter : public Enemy {
+	public:
+		Shotter() {
+			hitPoints = 100000;
+			animationCount = 0;
+			jumpable = false;
+		}
+
+		void Movement(Player* player, Map* map, ParticlesManager* particleManager)override;
+
+		void MakeAgressive()override;
+
+		SDL_Rect* ChooseAnimation()override;
+
+		~Shotter() {
 		}
 };
 
