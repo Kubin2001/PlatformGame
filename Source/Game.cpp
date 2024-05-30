@@ -44,13 +44,13 @@ void Game::Start() {
         case 1:
             ui = new UI(renderer);
             LoadTextures();
-            ui->font->LoadText(40, 29, 29);
+            ui->font->LoadText(29, 29);
             ui->CreateButton();
             break;
         case 2:
             camera = new Camera;
             ui = new UI(renderer);
-            ui->font->LoadText(40, 29, 29);
+            ui->font->LoadText(29, 29);
             map = new Map(renderer);
             mobs = new Mobs(renderer);
             player = new Player(renderer);

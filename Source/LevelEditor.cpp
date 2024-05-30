@@ -12,7 +12,7 @@
 LevelEditor::LevelEditor(SDL_Renderer* renderer) {
     this->renderer = renderer;
     ui = new UI(renderer);
-    ui->font->LoadText(40, 29, 29);
+    ui->font->LoadText(29, 29);
     ui->CreateSingleButton(50, 0, 250, 50, "TERRAIN", 26, 27,true);
     ui->CreateSingleButton(350, 0, 250, 50, "MOBS", 29, 30, true);
     ui->CreateSingleButton(650, 0, 250, 50, "EQUIPMENT", 20, 21, true);
