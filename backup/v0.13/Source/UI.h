@@ -1,0 +1,78 @@
+#pragma once
+#include <iostream>
+#include <SDL.h>
+#include <vector>
+#include "Font.h"
+class ButtonInfo {
+private:
+    SDL_Rect rectangle;
+    std::string text;
+
+public:
+    std::string GetText();
+    void SetText(std::string temptext);
+    SDL_Rect* GetRectangle();
+
+};
+
+class Button {
+    private:
+        SDL_Rect rectangle;
+        std::string text;
+
+    public:
+        std::string GetText();
+        void SetText(std::string temptext);
+        SDL_Rect* GetRectangle();
+
+};
+
+class Hearth {
+    private:
+        SDL_Rect rectangle;
+
+    public:
+        SDL_Rect* GetRectangle();
+
+};
+
+class UI
+{
+    private:
+        SDL_Renderer* renderer;
+        SDL_Texture * texturehearth = nullptr;
+        SDL_Texture* textureButton = nullptr;
+        SDL_Texture* textureButtonInfo = nullptr;
+        std::vector<Hearth> HP;
+        std::vector<Button> Buttons;
+        ButtonInfo* buttonInfo;
+        int menuType = 0;
+
+    public:
+        Font* font;
+
+        UI(SDL_Renderer* renderer);
+
+        SDL_Texture *GetTextureHearth();
+        void SetTextureHearth(SDL_Texture* temptex);
+        SDL_Texture* GetTextureButton();
+        void SetTextureButton(SDL_Texture* temptex);
+        SDL_Texture* GetTextureButtonInfo();
+        void SetTextureButtonInfo(SDL_Texture* temptex);
+
+        std::vector<Hearth> &getHP();
+        void CreateHearths();
+        void RemoveHearths();
+
+        void CreateButton();
+
+        void CreateButtonInfo(int x, int y, int w, int h, std::string text, int textSize, int textStep);
+
+        void Render();
+        void RenderHP();
+        void RenderButton();
+
+        void OnClick(SDL_Event event);
+
+        ~UI();
+};
